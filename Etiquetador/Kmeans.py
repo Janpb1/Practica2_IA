@@ -89,12 +89,52 @@ def _init_centroids(self):
     ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
     ##  AND CHANGE FOR YOUR OWN CODE
     #######################################################
+    
     if self.options['km_init'].lower() == 'first':
-        self.centroids = np.random.rand(self.K, self.X.shape[1])
-        self.old_centroids = np.random.rand(self.K, self.X.shape[1])
+        self.first_centroid()
+    elif self.options['km_init'].lower() == 'random':
+        self.random_centroid()
+    elif self.options['km_init'].lower() == 'custom':
+        self.custon_centroid()
     else:
         self.centroids = np.random.rand(self.K, self.X.shape[1])
         self.old_centroids = np.random.rand(self.K, self.X.shape[1])
+
+def first_centroid(self):
+    self.centroids.append(self.X[0]) #Inicialitzem el centroide amb el primer pixel
+    centroide_iniciats = 1 
+    while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
+        for pixel in self.X:
+            repetit = False
+            for centroids in self.centroids:
+                if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
+                    repetit = True 
+            if not repetit:
+                self.centroids.append(pixel)
+                centroide_iniciats += 1
+                break
+
+    """
+    Alternativa potser valida
+
+    self.centroids.append(self.X[0])
+    self.centroids.append(self.X[1])
+    self.centroids.append(self.X[2])
+    """
+
+def random_centroid(self):
+
+    self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
+    centroide_iniciats = 1 
+    while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
+        centroide_aleatori = self.centroids.append(np.random.choice(self.X.flatten()))
+        if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
+            self.centroids.append(centroide_aleatori)
+            centroide_iniciats += 1
+
+
+def custom_centroid(self):
+
 
 
 def get_labels(self):
