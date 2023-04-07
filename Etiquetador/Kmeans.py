@@ -142,6 +142,7 @@ def get_labels(self):
     """        Calculates the closest centroid of all points in X
     and assigns each point to the closest centroid
     """
+
     assignment = []
     for point in self.X:
         centroid_assigned = -1
@@ -151,15 +152,23 @@ def get_labels(self):
         assignment.append(min(distance))
     self.labels = assignment 
 
+
 def get_centroids(self):
     """
     Calculates coordinates of centroids based on the coordinates of all the points assigned to the centroid
     """
-    #######################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #######################################################
-    pass
+    
+    self.old_centroids = self.centroids
+    nous_centroides = np.zeros(len(self.K),len(self.X))
+    for point in range(len(self.X)):
+        centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
+        nous_centroides[centroide].append(self.X[point]) #Afegim el punt al centroid que li pertoca
+
+    for centroid in range(len(nous_centroides)):
+        nous_centroides[centroid] = np.average(np.array(nous_centroides[centroid]), 0)
+    
+    self.centroid = nous_centroides
+        
 
 
 def converges(self):
@@ -224,10 +233,10 @@ def distance(X, C):
     ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
     ##  AND CHANGE FOR YOUR OWN CODE
     #########################################################
-    dist = []
+    dist = np.empty()
     for point in X:
         point = np.array(point)
-        dist_points = []
+        dist_points = np.empty()
         for centroid in C:
             centroid = np.array(centroid)
             dist_points.append(np.linalg.norm(point - centroid))
