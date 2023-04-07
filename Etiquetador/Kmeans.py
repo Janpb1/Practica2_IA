@@ -45,8 +45,8 @@ class KMeans:
             x = x.reshape(tamany[0]*tamany[1],3)
             # x = x.reshape((tamany[0]*tamany[1],tamany[2]))
             
-            # elements = x.prod(x.shape)
-            # x = x.reshape(elements//3, 3)
+            #elements = x.prod(x.shape)
+            #x = x.reshape(elements//3, 3)
         
         self.X = x
         
@@ -114,27 +114,24 @@ def first_centroid(self):
                 centroide_iniciats += 1
                 break
 
-    """
-    Alternativa potser valida
-
-    self.centroids.append(self.X[0])
-    self.centroids.append(self.X[1])
-    self.centroids.append(self.X[2])
-    """
 
 def random_centroid(self):
 
     self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
     centroide_iniciats = 1 
     while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
-        centroide_aleatori = self.centroids.append(np.random.choice(self.X.flatten()))
+        centroide_aleatori = self.centroids.append(np.random.choice(self.X.flatten())) #Fem servir el flatten per posar tots els valors en un array
         if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
             self.centroids.append(centroide_aleatori)
             centroide_iniciats += 1
 
 
 def custom_centroid(self):
-
+    self.centroids.append(np.random.choice(self.X.flatten()))
+    centroide_iniciats = 1 
+    while centroide_iniciats < self.K:
+        distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X])
+        prob = distancies / np.sum(distancies)
 
 
 def get_labels(self):
