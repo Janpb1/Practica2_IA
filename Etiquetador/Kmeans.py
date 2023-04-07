@@ -3,7 +3,7 @@ __group__ = 'TO_BE_FILLED'
 
 import numpy as np
 import utils
-import math
+
 
 class KMeans:
 
@@ -127,11 +127,15 @@ def random_centroid(self):
 
 
 def custom_centroid(self):
-    self.centroids.append(np.random.choice(self.X.flatten()))
+
+    #Utilitzarem el KMeans++ per a la busqueda dels centroids com a opció random
+
+    self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem amb un centroid aleatori
     centroide_iniciats = 1 
     while centroide_iniciats < self.K:
-        distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X])
-        prob = distancies / np.sum(distancies)
+        distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X]) #Es calcula les distancies de tots els punts fins al centroid escollit
+        probabilitats = distancies / np.sum(distancies)
+        self.centroids.append(np.random.choice((self.X.flatten()),p=probabilitats)) #S'escull el centroid segons la probabilitat de la distancia entre el nou i el vell centroid
 
 
 def get_labels(self):
@@ -206,11 +210,11 @@ def distance(X, C):
     """
     Calculates the distance between each pixel and each centroid
     Args:
-        X (numpy array): NxD 1st set of data points (usually data points)
+        X (numpy array): PxD 1st set of data points (usually data points)
         C (numpy array): KxD 2nd set of data points (usually cluster centroids points)
 
     Returns:
-        dist: NxK numpy array position ij is the distance between the
+        dist: PxK numpy array position ij is the distance between the
         i-th point of the first set an the j-th point of the second set
     """
 
@@ -218,15 +222,7 @@ def distance(X, C):
     ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
     ##  AND CHANGE FOR YOUR OWN CODE
     #########################################################
-    dist = np.empty()
-    for point in X:
-        point = np.array(point)
-        dist_points = np.empty()
-        for centroid in C:
-            centroid = np.array(centroid)
-            dist_points.append(np.linalg.norm(point - centroid))
-        dist.append(dist_points)
-    return dist
+    return np.random.rand(X.shape[0], C.shape[0])
 
 
 def get_colors(centroids):
