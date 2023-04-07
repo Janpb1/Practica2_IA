@@ -222,7 +222,17 @@ def distance(X, C):
     ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
     ##  AND CHANGE FOR YOUR OWN CODE
     #########################################################
-    return np.random.rand(X.shape[0], C.shape[0])
+    dist = np.empty()
+    for point in X:
+        point = np.array(point)
+        dist_points = np.empty()
+        for centroid in C:
+            centroid = np.array(centroid)
+            dist_points.append(np.linalg.norm(point - centroid))
+        dist.append(dist_points)
+    return dist
+
+
 
 
 def get_colors(centroids):
