@@ -49,7 +49,7 @@ class KMeans:
             # x = x.reshape(elements//3, 3)
         
         self.X = x
-        #prova commit
+        
         
 
     def _init_options(self, options=None):
