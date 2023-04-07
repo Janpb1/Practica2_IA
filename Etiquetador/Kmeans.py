@@ -18,7 +18,12 @@ class KMeans:
         self.K = K
         self._init_X(X)
         self._init_options(options)  # DICT options
-
+        """
+        self.centroids = None
+        self.old_centroids = None
+        self.labels = None
+        self.WCD = None
+        """
     #############################################################
     ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
     #############################################################
@@ -30,10 +35,6 @@ class KMeans:
                     if matrix has more than 2 dimensions, the dimensionality of the sample space is the length of
                     the last dimension
         """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
         
         x = np.array(X)
         
@@ -84,11 +85,6 @@ def _init_centroids(self):
     """
     Initialization of centroids
     """
-
-    #######################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #######################################################
     
     if self.options['km_init'].lower() == 'first':
         self.first_centroid()
@@ -113,6 +109,7 @@ def first_centroid(self):
                 self.centroids.append(pixel)
                 centroide_iniciats += 1
                 break
+    self.old_centroids = self.centroids
 
 
 def random_centroid(self):
@@ -124,7 +121,7 @@ def random_centroid(self):
         if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
             self.centroids.append(centroide_aleatori)
             centroide_iniciats += 1
-
+    self.old_centroids = self.centroids
 
 def custom_centroid(self):
 
@@ -136,6 +133,8 @@ def custom_centroid(self):
         distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X]) #Es calcula les distancies de tots els punts fins al centroid escollit
         probabilitats = distancies / np.sum(distancies)
         self.centroids.append(np.random.choice((self.X.flatten()),p=probabilitats)) #S'escull el centroid segons la probabilitat de la distancia entre el nou i el vell centroid
+    
+    self.old_centroids = self.centroids
 
 
 def get_labels(self):
@@ -160,6 +159,7 @@ def get_centroids(self):
     
     self.old_centroids = self.centroids
     nous_centroides = np.zeros(len(self.K),len(self.X))
+    # nous_centroides = np.random.rand(self.K, self.X.shape[1])
     for point in range(len(self.X)):
         centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
         nous_centroides[centroide].append(self.X[point]) #Afegim el punt al centroid que li pertoca
@@ -175,12 +175,10 @@ def converges(self):
     """
     Checks if there is a difference between current and old centroids
     """
-    #######################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #######################################################
-    return True
+    
+    iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
 
+    return iguals
 
 def fit(self):
     """
@@ -228,11 +226,6 @@ def distance(X, C):
         dist: PxK numpy array position ij is the distance between the
         i-th point of the first set an the j-th point of the second set
     """
-
-    #########################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #########################################################
     dist = np.empty()
     for point in X:
         point = np.array(point)
