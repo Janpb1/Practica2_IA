@@ -18,15 +18,16 @@ class KMeans:
         self.K = K
         self._init_X(X)
         self._init_options(options)  # DICT options
+        
+    #############################################################
+    ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
+    #############################################################
         """
         self.centroids = None
         self.old_centroids = None
         self.labels = None
         self.WCD = None
         """
-    #############################################################
-    ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-    #############################################################
 
     def _init_X(self, X):
         """Initialization of all pixels, sets X as an array of data in vector form (PxD)
@@ -175,33 +176,32 @@ def converges(self):
     """
     Checks if there is a difference between current and old centroids
     """
-    
     iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
-
     return iguals
+
 
 def fit(self):
     """
     Runs K-Means algorithm until it converges or until the number
     of iterations is smaller than the maximum number of iterations.
     """
-    #######################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #######################################################
-    pass
+    self._init_centroids()
+    while i < self.options['max_iter'] and self.converges() != True:  
+        self.get_labels()
+        self.get_centroids()
+    #Podriamos poner np.inf en self.options o probar con self.X    
 
 
 def withinClassDistance(self):
     """
      returns the within class distance of the current clustering
     """
-
-    #######################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #######################################################
-    return np.random.rand()
+    #self.WCD
+    summation = 0 #Sumatorio
+    for point in range(len(self.X)):
+        #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
+        summation =+ np.linalg.norm(np.array(self.X[point]) - np.array(self.labels[point]))**2
+    self.WCD = (1/len(self.X)) * summation  
 
 
 def find_bestK(self, max_K):
