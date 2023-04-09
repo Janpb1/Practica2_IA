@@ -1,5 +1,5 @@
-__authors__ = 'TO_BE_FILLED'
-__group__ = 'TO_BE_FILLED'
+__authors__ = '1639484,1636492,1638248'
+__group__ = 'Álvaro Díaz,Jan Planas,Joan García'
 
 import numpy as np
 import utils
@@ -42,7 +42,7 @@ class KMeans:
         if x.dtype is not float:
             x = x.astype(float)
         
-        if x.dim > 2:
+        if x.ndim > 2:
             tamany = x.shape
             x = x.reshape(tamany[0]*tamany[1],3)
             # x = x.reshape((tamany[0]*tamany[1],tamany[2]))
@@ -82,137 +82,138 @@ class KMeans:
             
 
 
-def _init_centroids(self):
-    """
-    Initialization of centroids
-    """
-    
-    if self.options['km_init'].lower() == 'first':
-        self.first_centroid()
-    elif self.options['km_init'].lower() == 'random':
-        self.random_centroid()
-    elif self.options['km_init'].lower() == 'custom':
-        self.custon_centroid()
-    else:
-        self.centroids = np.random.rand(self.K, self.X.shape[1])
-        self.old_centroids = np.random.rand(self.K, self.X.shape[1])
+    def _init_centroids(self):
+        """
+        Initialization of centroids
+        """
+        
+        if self.options['km_init'].lower() == 'first':
+            self.first_centroid()
+        elif self.options['km_init'].lower() == 'random':
+            self.random_centroid()
+        elif self.options['km_init'].lower() == 'custom':
+            self.custon_centroid()
+        else:
+            self.centroids = np.random.rand(self.K, self.X.shape[1])
+            self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
-def first_centroid(self):
-    self.centroids.append(self.X[0]) #Inicialitzem el centroide amb el primer pixel
-    centroide_iniciats = 1 
-    while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
-        for pixel in self.X:
-            repetit = False
-            for centroids in self.centroids:
-                if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
-                    repetit = True 
-            if not repetit:
-                self.centroids.append(pixel)
-                centroide_iniciats += 1
-                break
-    self.old_centroids = self.centroids
-
-
-def random_centroid(self):
-
-    self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
-    centroide_iniciats = 1 
-    while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
-        centroide_aleatori = self.centroids.append(np.random.choice(self.X.flatten())) #Fem servir el flatten per posar tots els valors en un array
-        if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
-            self.centroids.append(centroide_aleatori)
-            centroide_iniciats += 1
-    self.old_centroids = self.centroids
-
-def custom_centroid(self):
-
-    #Utilitzarem el KMeans++ per a la busqueda dels centroids com a opció random
-
-    self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem amb un centroid aleatori
-    centroide_iniciats = 1 
-    while centroide_iniciats < self.K:
-        distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X]) #Es calcula les distancies de tots els punts fins al centroid escollit
-        probabilitats = distancies / np.sum(distancies)
-        self.centroids.append(np.random.choice((self.X.flatten()),p=probabilitats)) #S'escull el centroid segons la probabilitat de la distancia entre el nou i el vell centroid
-    
-    self.old_centroids = self.centroids
-
-
-def get_labels(self):
-    """        Calculates the closest centroid of all points in X
-    and assigns each point to the closest centroid
-    """
-
-    assignment = []
-    for point in self.X:
-        centroid_assigned = -1
-        distance = []
-        for centroid in range(len(self.centroids)):
-            distance.append(np.linalg.norm(np.array(point) - np.array(centroid)))
-        assignment.append(min(distance))
-    self.labels = assignment 
-
-
-def get_centroids(self):
-    """
-    Calculates coordinates of centroids based on the coordinates of all the points assigned to the centroid
-    """
-    
-    self.old_centroids = self.centroids
-    nous_centroides = np.zeros(len(self.K),len(self.X))
-    # nous_centroides = np.random.rand(self.K, self.X.shape[1])
-    for point in range(len(self.X)):
-        centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
-        nous_centroides[centroide].append(self.X[point]) #Afegim el punt al centroid que li pertoca
-
-    for centroid in range(len(nous_centroides)):
-        nous_centroides[centroid] = np.average(np.array(nous_centroides[centroid]), 0)
-    
-    self.centroid = nous_centroides
+    def first_centroid(self):
+        self.centroids.append(self.X[0]) #Inicialitzem el centroide amb el primer pixel
+        centroide_iniciats = 1 
+        while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
+            for pixel in self.X:
+                repetit = False
+                for centroids in self.centroids:
+                    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
+                        repetit = True 
+                if not repetit:
+                    self.centroids.append(pixel)
+                    centroide_iniciats += 1
+                    break
+        self.old_centroids = self.centroids
         
 
 
-def converges(self):
-    """
-    Checks if there is a difference between current and old centroids
-    """
-    iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
-    return iguals
+    def random_centroid(self):
+
+        self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
+        centroide_iniciats = 1 
+        while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
+            centroide_aleatori = self.centroids.append(np.random.choice(self.X.flatten())) #Fem servir el flatten per posar tots els valors en un array
+            if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
+                self.centroids.append(centroide_aleatori)
+                centroide_iniciats += 1
+        self.old_centroids = self.centroids
+
+    def custom_centroid(self):
+
+        #Utilitzarem el KMeans++ per a la busqueda dels centroids com a opció random
+
+        self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem amb un centroid aleatori
+        centroide_iniciats = 1 
+        while centroide_iniciats < self.K:
+            distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X]) #Es calcula les distancies de tots els punts fins al centroid escollit
+            probabilitats = distancies / np.sum(distancies)
+            self.centroids.append(np.random.choice((self.X.flatten()),p=probabilitats)) #S'escull el centroid segons la probabilitat de la distancia entre el nou i el vell centroid
+        
+        self.old_centroids = self.centroids
 
 
-def fit(self):
-    """
-    Runs K-Means algorithm until it converges or until the number
-    of iterations is smaller than the maximum number of iterations.
-    """
-    self._init_centroids()
-    while i < self.options['max_iter'] and self.converges() != True:  
-        self.get_labels()
-        self.get_centroids()
-    #Podriamos poner np.inf en self.options o probar con self.X    
+    def get_labels(self):
+        """        Calculates the closest centroid of all points in X
+        and assigns each point to the closest centroid
+        """
+
+        assignment = []
+        for point in self.X:
+            centroid_assigned = -1
+            distance = []
+            for centroid in range(len(self.centroids)):
+                distance.append(np.linalg.norm(np.array(point) - np.array(centroid)))
+            assignment.append(min(distance))
+        self.labels = assignment 
 
 
-def withinClassDistance(self):
-    """
-     returns the within class distance of the current clustering
-    """
-    #self.WCD
-    summation = 0 #Sumatorio
-    for point in range(len(self.X)):
-        #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
-        summation =+ np.linalg.norm(np.array(self.X[point]) - np.array(self.labels[point]))**2
-    self.WCD = (1/len(self.X)) * summation  
+    def get_centroids(self):
+        """
+        Calculates coordinates of centroids based on the coordinates of all the points assigned to the centroid
+        """
+        
+        self.old_centroids = self.centroids
+        nous_centroides = np.zeros(len(self.K),len(self.X))
+        # nous_centroides = np.random.rand(self.K, self.X.shape[1])
+        for point in range(len(self.X)):
+            centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
+            nous_centroides[centroide].append(self.X[point]) #Afegim el punt al centroid que li pertoca
+
+        for centroid in range(len(nous_centroides)):
+            nous_centroides[centroid] = np.average(np.array(nous_centroides[centroid]), 0)
+        
+        self.centroid = nous_centroides
+            
 
 
-def find_bestK(self, max_K):
-    """
-     sets the best k anlysing the results up to 'max_K' clusters
-    """
-    #######################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #######################################################
-    pass
+    def converges(self):
+        """
+        Checks if there is a difference between current and old centroids
+        """
+        iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
+        return iguals
+
+
+    def fit(self):
+        """
+        Runs K-Means algorithm until it converges or until the number
+        of iterations is smaller than the maximum number of iterations.
+        """
+        self._init_centroids()
+        while i < self.options['max_iter'] and self.converges() != True:  
+            self.get_labels()
+            self.get_centroids()
+        #Podriamos poner np.inf en self.options o probar con self.X    
+
+
+    def withinClassDistance(self):
+        """
+        returns the within class distance of the current clustering
+        """
+        #self.WCD
+        summation = 0 #Sumatorio
+        for point in range(len(self.X)):
+            #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
+            summation =+ np.linalg.norm(np.array(self.X[point]) - np.array(self.labels[point]))**2
+        self.WCD = (1/len(self.X)) * summation  
+
+
+    def find_bestK(self, max_K):
+        """
+        sets the best k anlysing the results up to 'max_K' clusters
+        """
+        #######################################################
+        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
+        ##  AND CHANGE FOR YOUR OWN CODE
+        #######################################################
+        pass
 
 
 def distance(X, C):
