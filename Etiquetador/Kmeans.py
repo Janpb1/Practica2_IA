@@ -98,6 +98,7 @@ class KMeans:
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
     def first_centroid(self):
+        self.centroids = []
         self.centroids.append(self.X[0]) #Inicialitzem el centroide amb el primer pixel
         centroide_iniciats = 1 
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
@@ -149,10 +150,10 @@ class KMeans:
             centroid_assigned = -1
             distance = []
             for centroid in range(len(self.centroids)):
-                distance.append(np.linalg.norm(np.array(point) - np.array(centroid)))
-            assignment.append(min(distance))
+                distance.append(np.linalg.norm(np.array(point) - np.array(self.centroids[centroid])))
+            assignment.append(distance.index(min(distance)))
         self.labels = assignment 
-
+        
 
     def get_centroids(self):
         """
@@ -160,7 +161,7 @@ class KMeans:
         """
         
         self.old_centroids = self.centroids
-        nous_centroides = np.zeros(len(self.K),len(self.X))
+        nous_centroides = [[] for x in range(self.K)]
         # nous_centroides = np.random.rand(self.K, self.X.shape[1])
         for point in range(len(self.X)):
             centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
@@ -187,9 +188,11 @@ class KMeans:
         of iterations is smaller than the maximum number of iterations.
         """
         self._init_centroids()
+        i = 0
         while i < self.options['max_iter'] and self.converges() != True:  
             self.get_labels()
             self.get_centroids()
+            i+=1
         #Podriamos poner np.inf en self.options o probar con self.X    
 
 
@@ -227,10 +230,10 @@ def distance(X, C):
         dist: PxK numpy array position ij is the distance between the
         i-th point of the first set an the j-th point of the second set
     """
-    dist = np.empty()
+    dist = []
     for point in X:
         point = np.array(point)
-        dist_points = np.empty()
+        dist_points = []
         for centroid in C:
             centroid = np.array(centroid)
             dist_points.append(np.linalg.norm(point - centroid))
