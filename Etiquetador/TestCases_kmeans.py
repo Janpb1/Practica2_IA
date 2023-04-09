@@ -17,8 +17,8 @@ class TestCases(unittest.TestCase):
 
     def test_01_NIU(self):
         # DON'T FORGET TO WRITE YOUR NIU AND GROUPS
-        self.assertNotEqual(km.__authors__, "TO_BE_FILLED", msg="1639484,1636492,1638248")
-        self.assertNotEqual(km.__group__, "TO_BE_FILLED", msg="CHANGE YOUR GROUP NAME!")
+        self.assertNotEqual(km.__authors__, "['1639484','1636492','1638248']", msg="['1639484','1636492','1638248']")
+        self.assertNotEqual(km.__group__, "DJ.12", msg="CHANGE YOUR GROUP NAME!")
 
     def test_02_init_X(self):
         for ix, input in enumerate(self.test_cases['input']):

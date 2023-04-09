@@ -1,5 +1,5 @@
-__authors__ = '1639484,1636492,1638248'
-__group__ = 'Álvaro Díaz,Jan Planas,Joan García'
+__authors__ = ['1639484','1636492','1638248']
+__group__ = 'DJ.12'
 
 import numpy as np
 import utils
