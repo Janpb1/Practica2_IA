@@ -167,12 +167,12 @@ class KMeans:
             centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
             nous_centroides[centroide].append(self.X[point]) #Afegim el punt al centroid que li pertoca
 
-        for centroid in range(len(nous_centroides)):
-            nous_centroides[centroid] = np.average(np.array(nous_centroides[centroid]), 0)
+        for centroides in range(len(nous_centroides)):
+            nous_centroides[centroides] = np.average(np.array(nous_centroides[centroides]), 0)
         
-        self.centroid = nous_centroides
+        self.centroids = nous_centroides
             
-
+    
 
     def converges(self):
         """
@@ -189,10 +189,12 @@ class KMeans:
         """
         self._init_centroids()
         i = 0
-        while i < self.options['max_iter'] and self.converges() != True:  
+        while i < self.options['max_iter']: #and self.converges():  
             self.get_labels()
             self.get_centroids()
             i+=1
+            if self.converges():
+                break
         #Podriamos poner np.inf en self.options o probar con self.X    
 
 
@@ -204,7 +206,7 @@ class KMeans:
         summation = 0 #Sumatorio
         for point in range(len(self.X)):
             #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
-            summation =+ np.linalg.norm(np.array(self.X[point]) - np.array(self.labels[point]))**2
+            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
         self.WCD = (1/len(self.X)) * summation  
 
 
@@ -216,8 +218,26 @@ class KMeans:
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
         #######################################################
-        pass
+        
+        self.K = 2
+        self.fit()
+        self.withinClassDistance()
 
+        while self.K < max_K:
+            wcd = self.WCD
+            self.K += 1
+            self.fit()
+            self.withinClassDistance()
+
+            DEC = 100*(self.WCD/wcd)
+            #print('WDC: ', self.WCD, 'wdc: ', wcd, '\n')
+            #print('DEC: ', DEC, '100-DEC = ', 100-DEC, '\n')
+            
+            if (100 - DEC) <= 20: #20% llindar per determinar estabilització
+                self.K -= 1
+                break
+            
+        
 
 def distance(X, C):
     """
@@ -257,4 +277,16 @@ def get_colors(centroids):
     ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
     ##  AND CHANGE FOR YOUR OWN CODE
     #########################################################
-    return list(utils.colors)
+    probabilitats = utils.get_color_prob(centroids)
+    colors = []
+
+    for centroide in range(len(centroids)):
+        maxProb = 0
+        color = -1
+        for probabilitat in range(len(probabilitats[centroide])):
+            if maxProb < probabilitats[centroide][probabilitat]: 
+                maxProb = probabilitats[centroide][probabilitat]
+                color = probabilitat 
+        colors.append(utils.colors[color])
+    
+    return colors
