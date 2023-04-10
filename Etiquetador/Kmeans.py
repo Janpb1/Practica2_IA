@@ -89,20 +89,20 @@ class KMeans:
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
             for pixel in self.X:
                 repetit = False
-                if (np.array_equal(pixel, centroids) for centroids in self.centroids):
-                   repetit = True 
-                #for centroids in self.centroids:
-                #    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
-                #        repetit = True 
+                #if (np.array_equal(pixel, centroids) for centroids in self.centroids):
+                   #repetit = True 
+                for centroids in self.centroids:
+                    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
+                        repetit = True
                 if not repetit:
-                    self.centroids.append(pixel)
+                    self.centroids[centroide_iniciats] = pixel
                     centroide_iniciats += 1
                     break
         self.old_centroids = self.centroids
         """
         self.centroids = np.zeros((self.K, self.X.shape[1]))
         self.centroids[0] = self.X[0]
-        centroide_iniciats = 1 
+        centroide_iniciats = 1
         while centroide_iniciats < self.K:
             for i, pixel in enumerate(self.X):
                 if not any(np.array_equal(pixel, c) for c in self.centroids):
@@ -151,17 +151,15 @@ class KMeans:
         """
         self.old_centroids = self.centroids
         nous_centroides = [[] for x in range(self.K)]
-        # nous_centroides = np.random.rand(self.K, self.X.shape[1])
         for point in range(len(self.X)):
-            centroide = self.labels[point] #Agafem el centroide que li pertoca al punt calculat a l'atribut labels
+            centroide = self.labels[point] #Agafim el centroide que li pertoca al punt calculat a l'atribut labels
             nous_centroides[centroide].append(self.X[point]) #Afegim el punt al centroid que li pertoca
-
+            
         for centroides in range(len(nous_centroides)):
             nous_centroides[centroides] = np.average(np.array(nous_centroides[centroides]), 0)
         
         self.centroids = nous_centroides
             
-    
 
     def converges(self):
         """
