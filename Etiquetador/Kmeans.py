@@ -288,16 +288,26 @@ def get_colors(centroids):
     ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
     ##  AND CHANGE FOR YOUR OWN CODE
     #########################################################
-    probabilitats = utils.get_color_prob(centroids)
+    probabilitats = utils.get_color_prob(centroids) #prob dels colors de cada centroide
     colors = []
-
+    
+    #porbabilitats -> matriu amb les porbabilitats de cada centroide
+    #Amb argmax agafem l'index maxim de cada fila y amb la funcio colors de la llibreria utils obtenim el color.
+    prob = np.argmax(probabilitats, axis=1)
+    colors = utils.colors[prob]
+    """
+    for color in prob:
+            colors.append(utils.colors[color])
+    """        
+    """
     for centroide in range(len(centroids)):
         maxProb = 0
-        color = -1
+        #color = -1
         for probabilitat in range(len(probabilitats[centroide])):
             if maxProb < probabilitats[centroide][probabilitat]: 
                 maxProb = probabilitats[centroide][probabilitat]
                 color = probabilitat 
         colors.append(utils.colors[color])
-    
+        #print(color, ', ')
+    """   
     return colors
