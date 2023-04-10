@@ -18,7 +18,10 @@ class KMeans:
         self.K = K
         self._init_X(X)
         self._init_options(options)  # DICT options
-        
+        self.centroids = []
+        self.old_centroids = []
+        self.labels = []
+        self.WCD = 0
     #############################################################
     ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
     #############################################################
@@ -187,9 +190,10 @@ class KMeans:
         Runs K-Means algorithm until it converges or until the number
         of iterations is smaller than the maximum number of iterations.
         """
+        self.__init__(self.X)
         self._init_centroids()
         i = 0
-        while i < self.options['max_iter']: #and self.converges():  
+        while i < self.options['max_iter'] and self.converges() == False:  
             self.get_labels()
             self.get_centroids()
             i+=1
@@ -202,11 +206,12 @@ class KMeans:
         """
         returns the within class distance of the current clustering
         """
-        #self.WCD
+        #self.WCD  
         summation = 0 #Sumatorio
         for point in range(len(self.X)):
             #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
-            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
+            centroid = self.labels[point]
+            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[centroid]))**2
         self.WCD = (1/len(self.X)) * summation  
 
 
@@ -236,6 +241,7 @@ class KMeans:
             if (100 - DEC) <= 20: #20% llindar per determinar estabilització
                 self.K -= 1
                 break
+        
             
         
 
