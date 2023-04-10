@@ -147,7 +147,13 @@ class KMeans:
         """        Calculates the closest centroid of all points in X
         and assigns each point to the closest centroid
         """
-
+        distances = np.zeros((self.X.shape[0], self.K))
+    
+        for i in range(self.K):
+            distances[:, i] = np.linalg.norm(self.X - self.centroids[i], axis=1)
+        
+        self.labels = np.argmin(distances, axis=1)
+        """
         assignment = []
         for point in self.X:
             centroid_assigned = -1
@@ -156,6 +162,7 @@ class KMeans:
                 distance.append(np.linalg.norm(np.array(point) - np.array(self.centroids[centroid])))
             assignment.append(distance.index(min(distance)))
         self.labels = assignment 
+        """
         
 
     def get_centroids(self):
@@ -194,7 +201,7 @@ class KMeans:
         self.get_labels()
         self.get_centroids()
         i = 0
-        while i < self.options['max_iter'] and self.converges() == False:  
+        while i < len(self.X) and not self.converges():  
             self.get_labels()
             self.get_centroids()
             i+=1
