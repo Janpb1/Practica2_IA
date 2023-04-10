@@ -190,15 +190,14 @@ class KMeans:
         Runs K-Means algorithm until it converges or until the number
         of iterations is smaller than the maximum number of iterations.
         """
-        self.__init__(self.X)
         self._init_centroids()
+        self.get_labels()
+        self.get_centroids()
         i = 0
         while i < self.options['max_iter'] and self.converges() == False:  
             self.get_labels()
             self.get_centroids()
             i+=1
-            if self.converges():
-                break
         #Podriamos poner np.inf en self.options o probar con self.X    
 
 
@@ -210,8 +209,7 @@ class KMeans:
         summation = 0 #Sumatorio
         for point in range(len(self.X)):
             #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
-            centroid = self.labels[point]
-            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[centroid]))**2
+            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
         self.WCD = (1/len(self.X)) * summation  
 
 
