@@ -22,15 +22,7 @@ class KMeans:
         self.old_centroids = []
         self.labels = []
         self.WCD = 0
-    #############################################################
-    ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-    #############################################################
-        """
-        self.centroids = None
-        self.old_centroids = None
-        self.labels = None
-        self.WCD = None
-        """
+        
 
     def _init_X(self, X):
         """Initialization of all pixels, sets X as an array of data in vector form (PxD)
@@ -44,17 +36,12 @@ class KMeans:
         
         if x.dtype is not float:
             x = x.astype(float)
-        
+
         if x.ndim > 2:
             tamany = x.shape
             x = x.reshape(tamany[0]*tamany[1],3)
-            # x = x.reshape((tamany[0]*tamany[1],tamany[2]))
             
-            #elements = x.prod(x.shape)
-            #x = x.reshape(elements//3, 3)
-        
         self.X = x
-        
         
 
     def _init_options(self, options=None):
@@ -78,18 +65,12 @@ class KMeans:
 
         # If your methods need any other parameter you can add it to the options dictionary
         self.options = options
-
-        #############################################################
-        ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-        #############################################################   
-            
-
+        
 
     def _init_centroids(self):
         """
         Initialization of centroids
         """
-        
         if self.options['km_init'].lower() == 'first':
             self.first_centroid()
         elif self.options['km_init'].lower() == 'random':
@@ -100,26 +81,39 @@ class KMeans:
             self.centroids = np.random.rand(self.K, self.X.shape[1])
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
+
     def first_centroid(self):
-        self.centroids = []
-        self.centroids.append(self.X[0]) #Inicialitzem el centroide amb el primer pixel
+        self.centroids = np.zeros((self.K, self.X.shape[1]))
+        self.centroids[0] = self.X[0] #Inicialitzem el centroide amb el primer pixel
         centroide_iniciats = 1 
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
             for pixel in self.X:
                 repetit = False
-                for centroids in self.centroids:
-                    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
-                        repetit = True 
+                if (np.array_equal(pixel, centroids) for centroids in self.centroids):
+                   repetit = True 
+                #for centroids in self.centroids:
+                #    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
+                #        repetit = True 
                 if not repetit:
                     self.centroids.append(pixel)
                     centroide_iniciats += 1
                     break
         self.old_centroids = self.centroids
-        
-
+        """
+        self.centroids = np.zeros((self.K, self.X.shape[1]))
+        self.centroids[0] = self.X[0]
+        centroide_iniciats = 1 
+        while centroide_iniciats < self.K:
+            for i, pixel in enumerate(self.X):
+                if not any(np.array_equal(pixel, c) for c in self.centroids):
+                    self.centroids[centroide_iniciats] = pixel
+                    centroide_iniciats += 1
+                if centroide_iniciats >= self.K:
+                    break
+        self.old_centroids = self.centroids
+        """
 
     def random_centroid(self):
-
         self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
         centroide_iniciats = 1 
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
@@ -130,9 +124,7 @@ class KMeans:
         self.old_centroids = self.centroids
 
     def custom_centroid(self):
-
         #Utilitzarem el KMeans++ per a la busqueda dels centroids com a opció random
-
         self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem amb un centroid aleatori
         centroide_iniciats = 1 
         while centroide_iniciats < self.K:
@@ -147,29 +139,16 @@ class KMeans:
         """        Calculates the closest centroid of all points in X
         and assigns each point to the closest centroid
         """
-        distances = np.zeros((self.X.shape[0], self.K))
-    
-        for i in range(self.K):
-            distances[:, i] = np.linalg.norm(self.X - self.centroids[i], axis=1)
-        
-        self.labels = np.argmin(distances, axis=1)
-        """
-        assignment = []
-        for point in self.X:
-            centroid_assigned = -1
-            distance = []
-            for centroid in range(len(self.centroids)):
-                distance.append(np.linalg.norm(np.array(point) - np.array(self.centroids[centroid])))
-            assignment.append(distance.index(min(distance)))
-        self.labels = assignment 
-        """
+        distancias = np.zeros((self.X.shape[0], self.K))
+        for cluster in range(self.K):
+            distancias[:, cluster] = np.linalg.norm(self.X - self.centroids[cluster], axis=1)
+        self.labels = np.argmin(distancias, axis=1)
         
 
     def get_centroids(self):
         """
         Calculates coordinates of centroids based on the coordinates of all the points assigned to the centroid
         """
-        
         self.old_centroids = self.centroids
         nous_centroides = [[] for x in range(self.K)]
         # nous_centroides = np.random.rand(self.K, self.X.shape[1])
@@ -190,7 +169,7 @@ class KMeans:
         """
         iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
         return iguals
-
+       
 
     def fit(self):
         """
@@ -198,14 +177,13 @@ class KMeans:
         of iterations is smaller than the maximum number of iterations.
         """
         self._init_centroids()
+        i = 0
         self.get_labels()
         self.get_centroids()
-        i = 0
         while i < len(self.X) and not self.converges():  
             self.get_labels()
             self.get_centroids()
             i+=1
-        #Podriamos poner np.inf en self.options o probar con self.X    
 
 
     def withinClassDistance(self):
@@ -224,11 +202,6 @@ class KMeans:
         """
         sets the best k anlysing the results up to 'max_K' clusters
         """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        
         self.K = 2
         self.fit()
         self.withinClassDistance()
@@ -246,7 +219,6 @@ class KMeans:
             if (100 - DEC) <= 20: #20% llindar per determinar estabilització
                 self.K -= 1
                 break
-        
             
         
 
@@ -273,7 +245,6 @@ def distance(X, C):
 
 
 
-
 def get_colors(centroids):
     """
     for each row of the numpy matrix 'centroids' returns the color label following the 11 basic colors as a LIST
@@ -295,19 +266,4 @@ def get_colors(centroids):
     #Amb argmax agafem l'index maxim de cada fila y amb la funcio colors de la llibreria utils obtenim el color.
     prob = np.argmax(probabilitats, axis=1)
     colors = utils.colors[prob]
-    """
-    for color in prob:
-            colors.append(utils.colors[color])
-    """        
-    """
-    for centroide in range(len(centroids)):
-        maxProb = 0
-        #color = -1
-        for probabilitat in range(len(probabilitats[centroide])):
-            if maxProb < probabilitats[centroide][probabilitat]: 
-                maxProb = probabilitats[centroide][probabilitat]
-                color = probabilitat 
-        colors.append(utils.colors[color])
-        #print(color, ', ')
-    """   
     return colors
