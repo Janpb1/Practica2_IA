@@ -1,7 +1,8 @@
 __authors__ = ['1639484', '1636492', '1638248']
 __group__ = 'DJ.12'
 
-from ctypes import resize
+from ctypes import POINTER, resize
+#from typing import Self
 import numpy as np
 import math
 import operator
@@ -15,7 +16,7 @@ class KNN:
         #############################################################
         ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
         #############################################################.        
-        self.neighbours = np.zeros(1000)
+        self.neighbors = []
 
 
     def _init_train(self, train_data):
@@ -25,11 +26,12 @@ class KNN:
         :return: assigns the train set to the matrix self.train_data shaped as PxD (P points in a D dimensional space)
         """
         if not isinstance(train_data, float):
-            train_data = float(train_data)
-
+            train_data = train_data.astype(float)
+        
         n_dimensions = train_data.shape
-        self.train_data = np.reshape(train_data, (n_dimensions[0], n_dimensions[1] * n_dimensions[2] * n_dimensions[3])
-
+        P = n_dimensions[0]
+        D = n_dimensions[1] * n_dimensions[2]
+        self.train_data = np.reshape(train_data, (P, D))
 
     def get_k_neighbours(self, test_data, k):
         """
@@ -41,9 +43,16 @@ class KNN:
         """
         #lo mismo que antes. Shape y redimensionamos igual
         n_dimensions = test_data.shape
-        punts = np.reshape(test_data, (n_dimensions[0], n_dimensions[1] * n_dimensions[2] * n_dimensions[3])  
-        distances = cdist(punts, self.train_data)
-
+        N = n_dimensions[0]
+        D = n_dimensions[1] * n_dimensions[2]
+        NxD = np.reshape(test_data, (N, D))
+        dist = cdist(NxD, self.train_data)
+        
+        for point in range(N):
+            dist_point_index = np.argsort(np.array(dist[point]))[:k]
+            self.neighbors.append([self.labels[i] for i in dist_point_index])
+              
+                
     def get_class(self):
         """
         Get the class by maximum voting
@@ -56,7 +65,20 @@ class KNN:
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
         #######################################################
-        return np.random.randint(10, size=self.neighbors.size), np.random.random(self.neighbors.size)
+        vots = np.random.randint(10, size=self.neighbors.size)
+        percentatges = np.random.random(self.neighbors.size)
+        filas = self.neighbors.shape
+        for i in range(filas[0]):
+            clases = [0 for k in list(self.labels)]
+            sum = 0
+            for j in range(filas[1]):
+                sum += 1
+                clases[list(self.labels).index(self.neighbors[i][j])] += 1
+                
+            vots[i] = list(self.labels).index(max(clases))
+            percentatges[i] = round((max(clases)/sum)*100)
+        
+        return vots, percentatges
 
     def predict(self, test_data, k):
         """
