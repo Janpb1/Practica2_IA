@@ -1,6 +1,7 @@
-__authors__ = 'TO_BE_FILLED'
-__group__ = 'TO_BE_FILLED'
+__authors__ = ['1639484', '1636492', '1638248']
+__group__ = 'DJ.12'
 
+from ctypes import resize
 import numpy as np
 import math
 import operator
@@ -13,7 +14,9 @@ class KNN:
         self.labels = np.array(labels)
         #############################################################
         ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-        #############################################################
+        #############################################################.        
+        self.neighbours = np.zeros(1000)
+
 
     def _init_train(self, train_data):
         """
@@ -21,11 +24,12 @@ class KNN:
         :param train_data: PxMxNx3 matrix corresponding to P color images
         :return: assigns the train set to the matrix self.train_data shaped as PxD (P points in a D dimensional space)
         """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        self.train_data = np.random.randint(8, size=[10, 14400])
+        if not isinstance(train_data, float):
+            train_data = float(train_data)
+
+        n_dimensions = train_data.shape
+        self.train_data = np.reshape(train_data, (n_dimensions[0], n_dimensions[1] * n_dimensions[2] * n_dimensions[3])
+
 
     def get_k_neighbours(self, test_data, k):
         """
@@ -35,11 +39,10 @@ class KNN:
         :return: the matrix self.neighbors is created (NxK)
                  the ij-th entry is the j-th nearest train point to the i-th test point
         """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
-        self.neighbors = np.random.randint(k, size=[test_data.shape[0], k])
+        #lo mismo que antes. Shape y redimensionamos igual
+        n_dimensions = test_data.shape
+        punts = np.reshape(test_data, (n_dimensions[0], n_dimensions[1] * n_dimensions[2] * n_dimensions[3])  
+        distances = cdist(punts, self.train_data)
 
     def get_class(self):
         """
