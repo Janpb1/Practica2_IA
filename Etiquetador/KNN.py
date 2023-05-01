@@ -68,25 +68,55 @@ class KNN:
         #######################################################
         vots = []
         percentatges = []
-        possibles_veins = list(set(self.labels))
+        #possibles_veins = list(set(self.labels))
         filas = self.neighbors.shape
         for i in range(0, filas[0]):
             clases = [0 for k in list(set(self.labels))]
             sum = 0
+            """maxim = 0"""
+            indices = []
             for j in range(0, filas[1]):
                 sum += 1
                 labels = np.array(list(set(self.labels)))
                 index = np.where(labels == self.neighbors[i][j])
                 clases[index[0][0]] += 1
+                indices.append(index[0][0])
+                """actual_max = max(clases)
+                if (maxim < actual_max):
+                    first_index = index[0][0]
+                    maxim = max(clases)"""
             
-            
-            vots.append(list(set(self.labels))[clases.index(max(clases))])
+            count = 0
+            for clase in clases:
+                if ( max(clases) == clase):
+                    count += 1
+            if (count > 1):
+                # Contar las ocurrencias de cada elemento en la lista
+                conteo = {}
+                for elemento in indices:
+                    if elemento in conteo:
+                        conteo[elemento] += 1
+                    else:
+                        conteo[elemento] = 1
+                
+                # Encontrar el elemento más común y su frecuencia
+                elemento_mas_comun = None
+                frecuencia_maxima = 0
+                for elemento, frecuencia in conteo.items():
+                    if frecuencia > frecuencia_maxima:
+                        elemento_mas_comun = elemento
+                        frecuencia_maxima = frecuencia
+                        
+                        
+                vots.append(labels[elemento_mas_comun])
+            else:
+                vots.append(list(set(self.labels))[clases.index(max(clases))])
             percentatges.append(round((max(clases)/sum)*100, 2))
             
             #vots[i] = list(set(self.labels))[clases.index(max(clases))]
             #percentatges[i] = round((max(clases)/sum)*100)
         
-        return np.array(vots), np.array(percentatges)
+        return np.array(vots)#, np.array(percentatges)
 
     def predict(self, test_data, k):
         """
