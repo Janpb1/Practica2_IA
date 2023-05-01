@@ -2,7 +2,7 @@ __authors__ = ['1639484', '1636492', '1638248']
 __group__ = 'DJ.12'
 
 from ctypes import POINTER, resize
-#from typing import Self
+from typing import Self
 import numpy as np
 import math
 import operator
