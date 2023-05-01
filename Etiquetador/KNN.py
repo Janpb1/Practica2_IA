@@ -51,6 +51,7 @@ class KNN:
         for point in range(N):
             dist_point_index = np.argsort(np.array(dist[point]))[:k]
             self.neighbors.append([self.labels[i] for i in dist_point_index])
+        self.neighbors = np.array(self.neighbors)
               
                 
     def get_class(self):
@@ -65,20 +66,27 @@ class KNN:
         ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
         ##  AND CHANGE FOR YOUR OWN CODE
         #######################################################
-        vots = np.random.randint(10, size=self.neighbors.size)
-        percentatges = np.random.random(self.neighbors.size)
+        vots = []
+        percentatges = []
+        possibles_veins = list(set(self.labels))
         filas = self.neighbors.shape
-        for i in range(filas[0]):
-            clases = [0 for k in list(self.labels)]
+        for i in range(0, filas[0]):
+            clases = [0 for k in list(set(self.labels))]
             sum = 0
-            for j in range(filas[1]):
+            for j in range(0, filas[1]):
                 sum += 1
-                clases[list(self.labels).index(self.neighbors[i][j])] += 1
-                
-            vots[i] = list(self.labels).index(max(clases))
-            percentatges[i] = round((max(clases)/sum)*100)
+                labels = np.array(list(set(self.labels)))
+                index = np.where(labels == self.neighbors[i][j])
+                clases[index[0][0]] += 1
+            
+            
+            vots.append(list(set(self.labels))[clases.index(max(clases))])
+            percentatges.append(round((max(clases)/sum)*100, 2))
+            
+            #vots[i] = list(set(self.labels))[clases.index(max(clases))]
+            #percentatges[i] = round((max(clases)/sum)*100)
         
-        return vots, percentatges
+        return np.array(vots), np.array(percentatges)
 
     def predict(self, test_data, k):
         """
