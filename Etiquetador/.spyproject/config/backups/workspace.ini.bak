@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['../../../../../.config/spyder-py3/temp.py', 'Kmeans.py', 'KNN.py', 'my_labeling.py', 'TestCases_kmeans.py', 'TestCases_knn.py', 'utils.py', 'utils_data.py', '../../../../../anaconda3/lib/python3.9/site-packages/numpy/core/numeric.py', '../../../../../anaconda3/lib/python3.9/site-packages/numpy/linalg/linalg.py', '../../../../../anaconda3/lib/python3.9/site-packages/numpy/core/multiarray.py', '../../../../../anaconda3/lib/python3.9/site-packages/numpy/testing/_private/utils.py']
+recent_files = ['Kmeans.py', 'KNN.py', 'my_labeling.py', 'TestCases_kmeans.py', 'TestCases_knn.py', 'utils.py', 'utils_data.py']
 
 [main]
 version = 0.2.0

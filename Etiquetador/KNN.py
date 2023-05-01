@@ -12,10 +12,7 @@ from scipy.spatial.distance import cdist
 class KNN:
     def __init__(self, train_data, labels):
         self._init_train(train_data)
-        self.labels = np.array(labels)
-        #############################################################
-        ##  THIS FUNCTION CAN BE MODIFIED FROM THIS POINT, if needed
-        #############################################################.        
+        self.labels = np.array(labels)   
         self.neighbors = []
 
 
@@ -41,7 +38,7 @@ class KNN:
         :return: the matrix self.neighbors is created (NxK)
                  the ij-th entry is the j-th nearest train point to the i-th test point
         """
-        #lo mismo que antes. Shape y redimensionamos igual
+        
         n_dimensions = test_data.shape
         N = n_dimensions[0]
         D = n_dimensions[1] * n_dimensions[2]
@@ -62,18 +59,13 @@ class KNN:
                             (i.e. the class at which that row belongs)
                 2nd array For each of the rows in self.neighbors gets the % of votes for the winning class
         """
-        #######################################################
-        ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-        ##  AND CHANGE FOR YOUR OWN CODE
-        #######################################################
+
         vots = []
         percentatges = []
-        #possibles_veins = list(set(self.labels))
         filas = self.neighbors.shape
         for i in range(0, filas[0]):
             clases = [0 for k in list(set(self.labels))]
             sum = 0
-            """maxim = 0"""
             indices = []
             for j in range(0, filas[1]):
                 sum += 1
@@ -81,25 +73,18 @@ class KNN:
                 index = np.where(labels == self.neighbors[i][j])
                 clases[index[0][0]] += 1
                 indices.append(index[0][0])
-                """actual_max = max(clases)
-                if (maxim < actual_max):
-                    first_index = index[0][0]
-                    maxim = max(clases)"""
-            
             count = 0
             for clase in clases:
-                if ( max(clases) == clase):
+                if max(clases) == clase:
                     count += 1
             if (count > 1):
-                # Contar las ocurrencias de cada elemento en la lista
                 conteo = {}
                 for elemento in indices:
                     if elemento in conteo:
                         conteo[elemento] += 1
                     else:
                         conteo[elemento] = 1
-                
-                # Encontrar el elemento más común y su frecuencia
+
                 elemento_mas_comun = None
                 frecuencia_maxima = 0
                 for elemento, frecuencia in conteo.items():
@@ -112,11 +97,8 @@ class KNN:
             else:
                 vots.append(list(set(self.labels))[clases.index(max(clases))])
             percentatges.append(round((max(clases)/sum)*100, 2))
-            
-            #vots[i] = list(set(self.labels))[clases.index(max(clases))]
-            #percentatges[i] = round((max(clases)/sum)*100)
-        
-        return np.array(vots)#, np.array(percentatges)
+
+        return np.array(vots)
 
     def predict(self, test_data, k):
         """
