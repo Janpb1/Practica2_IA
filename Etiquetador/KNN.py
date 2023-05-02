@@ -58,17 +58,41 @@ class KNN:
                 1st array For each of the rows in self.neighbors gets the most voted value
                             (i.e. the class at which that row belongs)
                 2nd array For each of the rows in self.neighbors gets the % of votes for the winning class
-        """
+        
         vots = []
         percentatges = []
-        filas = self.neighbors.shape
-        for i in range(0, filas[0]):
+        for neighbours in self.neighbors:
             sum = 0
             clases = {}
-            for j in range(0, filas[1]):
+            for clase in neighbours:
                 sum += 1
-                labels = np.array(list(self.labels))
-                index = np.where(labels == self.neighbors[i][j])
+                index = list(self.labels).index(clase)
+                if index in clases:
+                        clases[index] += 1
+                else:
+                        clases[index] = 1
+
+            indice_mas_comun = None
+            frecuencia_max = 0
+            for indice, frecuencia in clases.items():
+                if frecuencia > frecuencia_max:
+                    indice_mas_comun = indice
+                    frecuencia_max = frecuencia 
+                        
+            vots.append(self.labels[indice_mas_comun])
+            percentatges.append(round(frecuencia/sum * 100,2))
+
+        return np.array(vots)
+        """
+        filas,columnas = self.neighbors.shape
+        vots = np.random.random(filas).astype('<U8')
+        percentatges = np.random.random(filas)
+        for i in range(filas):
+            sum = 0
+            clases = {}
+            for j in range(columnas):
+                sum += 1
+                index = np.where(self.labels == self.neighbors[i][j])
                 if index[0][0] in clases:
                         clases[index[0][0]] += 1
                 else:
@@ -81,10 +105,10 @@ class KNN:
                     indice_mas_comun = indice
                     frecuencia_max = frecuencia 
                         
-            vots.append(labels[indice_mas_comun])
-            percentatges.append(round(frecuencia/sum * 100,2))
+            vots[i] = self.labels[indice_mas_comun]
+            percentatges[i] = round(frecuencia/sum * 100, 2)
 
-        return np.array(vots)
+        return vots
 
     def predict(self, test_data, k):
         """
