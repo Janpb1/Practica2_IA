@@ -58,7 +58,8 @@ class KNN:
                 1st array For each of the rows in self.neighbors gets the most voted value
                             (i.e. the class at which that row belongs)
                 2nd array For each of the rows in self.neighbors gets the % of votes for the winning class
-        
+                
+        #VERSION CON LISTAS
         vots = []
         percentatges = []
         for neighbours in self.neighbors:
@@ -84,6 +85,7 @@ class KNN:
 
         return np.array(vots)
         """
+        #VERSION CON NP
         filas,columnas = self.neighbors.shape
         vots = np.random.random(filas).astype('<U8')
         percentatges = np.random.random(filas)
@@ -109,7 +111,7 @@ class KNN:
             percentatges[i] = round(frecuencia/sum * 100, 2)
 
         return vots
-
+        
     def predict(self, test_data, k):
         """
         predicts the class at which each element in test_data belongs to
