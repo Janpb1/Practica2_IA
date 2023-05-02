@@ -84,7 +84,7 @@ class KNN:
             percentatges.append(round(frecuencia/sum * 100,2))
 
         return np.array(vots)
-        """
+        
         #VERSION CON NP
         filas,columnas = self.neighbors.shape
         vots = np.random.random(filas).astype('<U8')
@@ -111,7 +111,33 @@ class KNN:
             percentatges[i] = round(frecuencia/sum * 100, 2)
 
         return vots
+        """
         
+        #VERSION CON NP
+        filas,columnas = self.neighbors.shape
+        vots = np.random.random(filas).astype('<U8')
+        percentatges = np.random.random(filas)
+        posicio = 0
+        for neighbour in self.neighbors:
+            clase, index, frequencia = np.unique(neighbour, return_index=True, return_counts=True)
+            clase = neighbour[np.sort(index)]
+            frequencia = frequencia[np.argsort(index)]
+            clases_freq = dict(zip(clase,frequencia))
+            etiqueta = None
+            frecuencia_max = 0
+            frequencia_total = 0
+            for valor, frecuencia in clases_freq.items():
+                frequencia_total += frecuencia
+                if frecuencia > frecuencia_max:
+                    etiqueta = valor
+                    frecuencia_max = frecuencia
+                        
+            vots[posicio] = etiqueta
+            a = round(frecuencia_max/frequencia_total * 100, 2)
+            percentatges[posicio] = a
+            posicio += 1
+
+        return vots
     def predict(self, test_data, k):
         """
         predicts the class at which each element in test_data belongs to
