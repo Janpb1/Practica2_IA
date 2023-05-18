@@ -18,9 +18,9 @@ class KMeans:
         self.K = K
         self._init_X(X)
         self._init_options(options)  # DICT options
-        self.centroids = []
-        self.old_centroids = []
-        self.labels = []
+        self.centroids = np.zeros((K, self.X.shape[1]))
+        self.old_centroids = np.zeros((K, self.X.shape[1]))
+        self.labels = np.zeros((K, self.X.shape[1]))
         self.WCD = 0
         
 
@@ -76,14 +76,14 @@ class KMeans:
         elif self.options['km_init'].lower() == 'random':
             self.random_centroid()
         elif self.options['km_init'].lower() == 'custom':
-            self.custon_centroid()
+            self.custom_centroid()
         else:
             self.centroids = np.random.rand(self.K, self.X.shape[1])
             self.old_centroids = np.random.rand(self.K, self.X.shape[1])
 
 
     def first_centroid(self):
-        self.centroids = np.zeros((self.K, self.X.shape[1]))
+        #self.centroids = np.zeros((self.K, self.X.shape[1]))
         self.centroids[0] = self.X[0] #Inicialitzem el centroide amb el primer pixel
         centroide_iniciats = 1 
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
@@ -114,12 +114,12 @@ class KMeans:
         """
 
     def random_centroid(self):
-        self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
+        self.centroids[0] = np.random.choice(self.X.flatten()) #Inicialitzem el centroide amb un pixel aleatori
         centroide_iniciats = 1 
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
-            centroide_aleatori = self.centroids.append(np.random.choice(self.X.flatten())) #Fem servir el flatten per posar tots els valors en un array
+            centroide_aleatori = np.random.choice(self.X.flatten()) #Fem servir el flatten per posar tots els valors en un array
             if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
-                self.centroids.append(centroide_aleatori)
+                self.centroids[centroide_iniciats] = centroide_aleatori
                 centroide_iniciats += 1
         self.old_centroids = self.centroids
 
@@ -158,7 +158,7 @@ class KMeans:
         for centroides in range(len(nous_centroides)):
             nous_centroides[centroides] = np.average(np.array(nous_centroides[centroides]), 0)
         
-        self.centroids = nous_centroides
+        self.centroids = np.array(nous_centroides)
             
 
     def converges(self):
