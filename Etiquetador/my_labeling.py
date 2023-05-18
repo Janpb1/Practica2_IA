@@ -14,13 +14,14 @@ def Retrieval_by_color(list_img, color_labels, color_question):
     
     for i in range(len(list_img)):
         if isinstance(color_question, str):
-            for color in color_question:
-                if color_labels[i] == color:
+            for j in range(len(color_labels[i])):
+                if color_labels[i][j] == color_question:
                     trobats.append(list_img[i])
-                    break
         else:
-            if color_labels[i] == color:
-                    trobats.append(list_img[i])
+            for color in color_question:
+                for j in range(len(color_labels[i])):
+                    if color_labels[i][j] == color_question:
+                        trobats.append(list_img[i])
     
     return trobats
 
@@ -40,8 +41,10 @@ def Retrieval_combined(list_img, shape_labels, color_labels, shape_question, col
     trobats = []
     
     for i in range(len(list_img)):
-        if shape_labels[i] == shape_question and color_labels[i] == color_question:
-            trobats.append(list_img[i])
+        if shape_labels[i] == shape_question:
+            for j in range(len(color_labels[i])):
+                if color_labels[i][j] == color_question:
+                    trobats.append(list_img[i])
     
     return trobats
 
@@ -79,6 +82,7 @@ if __name__ == '__main__':
 
     # List with all the existent classes
     classes = list(set(list(train_class_labels) + list(test_class_labels)))
+    
 
     test_imgs = test_imgs[:40]
     knn = KNN(train_imgs, train_class_labels)
@@ -91,9 +95,17 @@ if __name__ == '__main__':
         color_results.append(colors)
 
     print("Retrieving grey flip-flops")
-    grey_flip_flops = Retrieval_combined(test_imgs, label_results, color_results, "Flip Flops", ["Grey"])
+    grey_flip_flops = Retrieval_combined(test_imgs, label_results, color_results, "Flip Flo", "Grey")
     for image in grey_flip_flops:
         imageObj = Image.fromarray(image)
         imageObj.show()
-    
+
     # You can start coding your functions here
+
+
+
+
+
+
+
+
