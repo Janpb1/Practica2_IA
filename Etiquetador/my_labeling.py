@@ -20,7 +20,7 @@ def Retrieval_by_color(list_img, color_labels, color_question):
         else:
             for color in color_question:
                 for j in range(len(color_labels[i])):
-                    if color_labels[i][j] == color_question:
+                    if color_labels[i][j] == color:
                         trobats.append(list_img[i])
     
     return trobats
