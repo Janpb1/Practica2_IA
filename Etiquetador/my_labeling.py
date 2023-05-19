@@ -1,4 +1,3 @@
-
 __authors__ = 'TO_BE_FILLED'
 __group__ = 'TO_BE_FILLED'
 
@@ -52,7 +51,7 @@ def Retrieval_combined(list_img, shape_labels, color_labels, shape_question, col
 
 def Kmean_statistics(Kmeans_list, Kmax):
     WCD = np.zeros((len(Kmeans_list)))
-    iter = np.zeros((len(Kmeans_list)))
+    iters = np.zeros((len(Kmeans_list)))
     time = np.zeros((len(Kmeans_list)))
     
     for i in range(len(Kmeans_list)):
@@ -70,9 +69,9 @@ def Kmean_statistics(Kmeans_list, Kmax):
             WCD_list.append(Kmeans.WCD)
         WCD[i] = WCD_list
         time[i] = time_list
-        iter[i] = Kmeans.num_iter
+        iters[i] = Kmeans.num_iter
         
-    return WCD, time, iter
+    return WCD, time, iters
 
 
 def mostrar_imagenes(imagenes):
@@ -105,9 +104,11 @@ if __name__ == '__main__':
     knn = KNN(train_imgs, train_class_labels)
     color_results = []
     label_results = knn.predict(test_imgs, 10)
+    Kmeans = []
     for image in test_imgs:
-        km = KMeans(image, 7)
+        km = KMeans(image, 4)
         km.fit()    
+        Kmeans.append(km)
         colors = get_colors(np.array([list(km.centroids[0]), list(km.centroids[1]), list(km.centroids[2])]))
         color_results.append(colors)
 
@@ -123,12 +124,6 @@ if __name__ == '__main__':
     vestidos = Retrieval_by_shape(test_imgs[:100], label_results,"Dresses")
     mostrar_imagenes(vestidos)
     
+    WCD, time, iters = Kmean_statistics(Kmeans, 7)
+    
     # You can start coding your functions here
-
-
-
-
-
-
-
-
