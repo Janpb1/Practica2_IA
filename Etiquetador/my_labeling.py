@@ -1,7 +1,7 @@
 __authors__ = 'TO_BE_FILLED'
 __group__ = 'TO_BE_FILLED'
 
-from utils_data import read_dataset
+import utils_data as ud
 import numpy as np
 from PIL import Image
 from Kmeans import *
@@ -94,36 +94,49 @@ if __name__ == '__main__':
     
     # Load all the images and GT
     train_imgs, train_class_labels, train_color_labels, test_imgs, test_class_labels, \
-        test_color_labels = read_dataset(ROOT_FOLDER='./images/', gt_json='./images/gt.json')
+        test_color_labels = ud.read_dataset(ROOT_FOLDER='./images/', gt_json='./images/gt.json')
 
     # List with all the existent classes
     classes = list(set(list(train_class_labels) + list(test_class_labels)))
     
 
-    #test_imgs = test_imgs[:100]
+    test_imgs = test_imgs[:100]
     knn = KNN(train_imgs, train_class_labels)
     color_results = []
     label_results = knn.predict(test_imgs, 10)
     Kmeans = []
     for image in test_imgs:
-        km = KMeans(image, 4)
+        km = KMeans(image, 7)
         km.fit()    
         Kmeans.append(km)
         colors = get_colors(np.array([list(km.centroids[0]), list(km.centroids[1]), list(km.centroids[2])]))
         color_results.append(colors)
-
+    
+    for Kmean in Kmeans:
+        ax = ud.Plot3DCloud(Kmean)
+    
     print("Mostrando pantalones negros")
     pantalones_negros = Retrieval_combined(test_imgs, label_results, color_results, "Jeans", "Black")
-    mostrar_imagenes(pantalones_negros)
+    ud.visualize_retrieval(pantalones_negros, 1)
+    #mostrar_imagenes(pantalones_negros)
     
     print("Mostrando ropa verde")
     ropa_verde = Retrieval_by_color(test_imgs[:100], color_results,"Green")
-    mostrar_imagenes(ropa_verde)
+    ud.visualize_retrieval(ropa_verde, 1)
+    #mostrar_imagenes(ropa_verde)
     
     print("Mostrando vestidos")
     vestidos = Retrieval_by_shape(test_imgs[:100], label_results,"Dresses")
-    mostrar_imagenes(vestidos)
+    ud.visualize_retrieval(vestidos, 1)
+    #mostrar_imagenes(vestidos)
     
+    for Kmean in Kmeans:
+        ud.visualize_k_means(Kmean, (4800,1))
+    """
     WCD, time, iters = Kmean_statistics(Kmeans, 7)
+    for wcd, times in zip(WCD, time):
+        print(wcd, times)
+    print(iters)
+    """
     
     # You can start coding your functions here
