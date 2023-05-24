@@ -94,14 +94,18 @@ if __name__ == '__main__':
     
     # Load all the images and GT
     train_imgs, train_class_labels, train_color_labels, test_imgs, test_class_labels, \
-        test_color_labels = ud.read_dataset(ROOT_FOLDER='./images/', gt_json='./images/gt.json')
+        test_color_labels = ud.read_dataset(root_folder='./images/', gt_json='./images/gt.json')
 
     # List with all the existent classes
     classes = list(set(list(train_class_labels) + list(test_class_labels)))
     
+    # Load extended ground truth
+    imgs, class_labels, color_labels, upper, lower, background = ud.read_extended_dataset()
+    cropped_images = ud.crop_images(imgs, upper, lower)
+    
 
-    test_imgs = test_imgs[:100]
-    knn = KNN(train_imgs, train_class_labels)
+    imgs = imgs[:100]
+    knn = KNN(imgs, class_labels)
     color_results = []
     label_results = knn.predict(test_imgs, 10)
     Kmeans = []
@@ -114,7 +118,6 @@ if __name__ == '__main__':
     
     for Kmean in Kmeans:
         ax = ud.Plot3DCloud(Kmean)
-    
     
     print("Mostrando pantalones negros")
     pantalones_negros = Retrieval_combined(test_imgs, label_results, color_results, "Jeans", "Black")
@@ -132,7 +135,7 @@ if __name__ == '__main__':
     #mostrar_imagenes(vestidos)
     
     for Kmean in Kmeans:
-        ud.visualize_k_means(Kmean, (4800,1))
+        ud.visualize_k_means(Kmean, (335232,100))
     """
     WCD, time, iters = Kmean_statistics(Kmeans, 7)
     for wcd, times in zip(WCD, time):

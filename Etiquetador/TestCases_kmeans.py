@@ -12,15 +12,14 @@ class TestCases(unittest.TestCase):
 
     def setUp(self):
         np.random.seed(123)
-        with open('/home/jan/Documents/Practica2_IA/Etiquetador/test/test_cases_kmeans.pkl', 'rb') as f:
+        with open('./test/test_cases_kmeans.pkl', 'rb') as f:
             self.test_cases = pickle.load(f)
-    
+
     def test_01_NIU(self):
         # DON'T FORGET TO WRITE YOUR NIU AND GROUPS
         self.assertNotEqual(km.__authors__, "TO_BE_FILLED", msg="CHANGE IT TO YOUR NIU!")
         self.assertNotEqual(km.__group__, "TO_BE_FILLED", msg="CHANGE YOUR GROUP NAME!")
-    
-    
+
     def test_02_init_X(self):
         for ix, input in enumerate(self.test_cases['input']):
             km = KMeans(input, self.test_cases['K'][ix])
