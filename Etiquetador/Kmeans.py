@@ -3,7 +3,7 @@ __group__ = 'DJ.12'
 
 import numpy as np
 import utils
-
+from scipy.spatial.distance import cdist
 
 class KMeans:
 
@@ -211,12 +211,26 @@ class KMeans:
         return (1/len(self.X)) * summation #WCD
         
     def interClassDistance(self):
+        """
         summation = 0 
-        for point in range(len(self.X)):
-            #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
-            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
-        return summation / len(self.X) #ICD
-            
+        for centroid in range(self.K):
+            points = self.X[np.where(self.labels == centroid)]
+            for centroid2 in range(self.K):
+                if centroid != centroid2: 
+                    summation += np.linalg.norm(np.array(self.X[np.where(self.labels == centroid2)]) - points)**2
+        return summation / len(self.X)
+        """
+        summation = 0
+        for centroid in range(0, len(self.centroids)):
+            points = np.where(self.labels == centroid)
+            c = []
+            for centroid2 in range(len(self.centroids)):
+                if centroid2 != centroid:
+                    c.append(self.centroids[centroid2])
+            for centroid3 in c:
+                summation += np.sum((self.X[points] - centroid3) ** 2) 
+        return summation/len(self.X)
+                                            
     def fisher(self):
         return self.withinClassDistance() / self.interClassDistance() #Fisher
     
@@ -232,24 +246,33 @@ class KMeans:
             icd = self.interClassDistance()
         elif heuristic == 'FISHER':
             fisher = self.fisher()
-            
-        while self.K < max_K:
-            self.K += 1
+        
+        self.K += 1
+        while self.K <= max_K:
             self.fit()
             if heuristic == 'WCD':
-                DEC = 100 * (wcd / self.withinClassDistance())
+                dec = 100 * (self.withinClassDistance() / wcd)
             elif heuristic == 'ICD':
-                DEC = 100 * (icd / self.interClassDistance())
+                dec = 100 * (icd / self.interClassDistance())
             elif heuristic == 'FISHER':
-                DEC = 100 * (fisher / self.fisher())
+                dec = 100 * (fisher / self.fisher())
                 
             #DEC = 100*(self.WCD/wcd)
             #print('WDC: ', self.WCD, 'wdc: ', wcd, '\n')
             #print('DEC: ', DEC, '100-DEC = ', 100-DEC, '\n')
             
-            if (100 - DEC) <= 20: #20% llindar per determinar estabilització
+            if (100 - dec) <= 20: #20% llindar per determinar estabilització
                 self.K -= 1
                 break
+            else:
+                self.K += 1
+                if heuristic == 'WCD':
+                    wcd = self.withinClassDistance()
+                elif heuristic == 'ICD':
+                    icd = self.interClassDistance()
+                elif heuristic == 'FISHER':
+                    fisher = self.fisher()
+    
         self.fit()
             
         

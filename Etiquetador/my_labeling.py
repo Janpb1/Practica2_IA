@@ -126,9 +126,10 @@ if __name__ == '__main__':
         km.find_bestK(10)
         km.fit()
         Kmeans.append(km)
+        """
         colors = get_colors(np.array([list(km.centroids[0]), list(km.centroids[1]), list(km.centroids[2])]))
         color_results.append(colors)
-    
+        """
     for Kmean in Kmeans:
         ay = ud.visualize_k_means(Kmean, [80,60,3])
         print(Kmean.K)
