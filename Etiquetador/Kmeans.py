@@ -21,7 +21,7 @@ class KMeans:
         self.centroids = np.zeros((K, self.X.shape[1]))
         self.old_centroids = np.zeros((K, self.X.shape[1]))
         self.labels = np.zeros((K, self.X.shape[1]))
-        self.WCD = 0
+        #self.WCD = 0
         
 
     def _init_X(self, X):
@@ -83,35 +83,35 @@ class KMeans:
 
 
     def first_centroid(self):
+        """
         #self.centroids = np.zeros((self.K, self.X.shape[1]))
-        self.centroids[0] = self.X[0] #Inicialitzem el centroide amb el primer pixel
-        centroide_iniciats = 1 
-        while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
+        selected_pixels = {}
+        centroides = []
+        centroides_iniciats = 0
+        while centroides_iniciats < self.K:
             for pixel in self.X:
-                repetit = False
-                #if (np.array_equal(pixel, centroids) for centroids in self.centroids):
-                   #repetit = True 
-                for centroids in self.centroids:
-                    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
-                        repetit = True
-                if not repetit:
-                    self.centroids[centroide_iniciats] = pixel
-                    centroide_iniciats += 1
+                aux = tuple(pixel)
+                if aux not in selected_pixels:
+                    centroides.append(pixel)
+                    selected_pixels[aux] = 1  # Marcando el píxel como usado para no repetirlo
                     break
-        self.old_centroids = self.centroids
+        
+        self.centroids = np.array(self.centroids)
+        self.old_centroids = np.copy(self.centroids)
+
         """
-        self.centroids = np.zeros((self.K, self.X.shape[1]))
-        self.centroids[0] = self.X[0]
-        centroide_iniciats = 1
-        while centroide_iniciats < self.K:
-            for i, pixel in enumerate(self.X):
-                if not any(np.array_equal(pixel, c) for c in self.centroids):
-                    self.centroids[centroide_iniciats] = pixel
-                    centroide_iniciats += 1
-                if centroide_iniciats >= self.K:
+        selected_pixels = {}
+        self.centroids = []
+        for i in range(self.K):
+            for pixel in self.X:
+                aux = tuple(pixel)
+                if aux not in selected_pixels:
+                    self.centroids.append(pixel)
+                    selected_pixels[aux] = 1  # Marking the pixel as used so we don't repeat it
                     break
-        self.old_centroids = self.centroids
-        """
+        self.centroids = np.copy(self.centroids)
+        self.old_centroids = np.copy(self.centroids)
+        
 
     def random_centroid(self):
         self.centroids[0] = np.random.choice(self.X.flatten()) #Inicialitzem el centroide amb un pixel aleatori
@@ -165,7 +165,10 @@ class KMeans:
         """
         Checks if there is a difference between current and old centroids
         """
-        iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
+        if self.centroids.size == self.old_centroids.size:
+            iguals = np.allclose(self.centroids, self.old_centroids, rtol = self.options['tolerance'], atol = self.options['tolerance'], equal_nan = False)
+        else:
+            iguals = False
         return iguals
        
 
@@ -194,29 +197,60 @@ class KMeans:
             #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
             summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
         self.WCD = (1/len(self.X)) * summation  
-
-
-    def find_bestK(self, max_K):
+        
+        
+    def withinClassDistance(self):
+        """
+        returns the within class distance of the current clustering
+        """
+        #self.WCD  
+        summation = 0 #Sumatorio
+        for point in range(len(self.X)):
+            #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
+            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
+        return (1/len(self.X)) * summation #WCD
+        
+    def interClassDistance(self):
+        summation = 0 
+        for point in range(len(self.X)):
+            #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
+            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
+        return summation / len(self.X) #ICD
+            
+    def fisher(self):
+        return self.withinClassDistance() / self.interClassDistance() #Fisher
+    
+    def find_bestK(self, max_K, heuristic = 'WCD'):
         """
         sets the best k anlysing the results up to 'max_K' clusters
         """
         self.K = 2
         self.fit()
-        self.withinClassDistance()
-
+        if heuristic == 'WCD':
+            wcd = self.withinClassDistance()
+        elif heuristic == 'ICD':
+            icd = self.interClassDistance()
+        elif heuristic == 'FISHER':
+            fisher = self.fisher()
+            
         while self.K < max_K:
-            wcd = self.WCD
             self.K += 1
             self.fit()
-            self.withinClassDistance()
-
-            DEC = 100*(self.WCD/wcd)
+            if heuristic == 'WCD':
+                DEC = 100 * (wcd / self.withinClassDistance())
+            elif heuristic == 'ICD':
+                DEC = 100 * (icd / self.interClassDistance())
+            elif heuristic == 'FISHER':
+                DEC = 100 * (fisher / self.fisher())
+                
+            #DEC = 100*(self.WCD/wcd)
             #print('WDC: ', self.WCD, 'wdc: ', wcd, '\n')
             #print('DEC: ', DEC, '100-DEC = ', 100-DEC, '\n')
             
             if (100 - DEC) <= 20: #20% llindar per determinar estabilització
                 self.K -= 1
                 break
+        self.fit()
             
         
 
@@ -252,11 +286,6 @@ def get_colors(centroids):
     Returns:
         labels: list of K labels corresponding to one of the 11 basic colors
     """
-
-    #########################################################
-    ##  YOU MUST REMOVE THE REST OF THE CODE OF THIS FUNCTION
-    ##  AND CHANGE FOR YOUR OWN CODE
-    #########################################################
     probabilitats = utils.get_color_prob(centroids) #prob dels colors de cada centroide
     colors = []
     

@@ -73,6 +73,19 @@ def Kmean_statistics(Kmeans_list, Kmax):
         
     return WCD, time, iters
 
+def get_shape_accuracy(classes, gt):
+    return str(sum(1 for x, y in zip(labels, gt) if x == y)/len(labels))
+
+
+def get_color_accuracy(colors, gt):
+    color_accuracy = 0
+    for i in range(len(labels)):
+        labels_set = list(set(labels[i]))
+        for j in range(len(set(labels_set))):
+            if labels_set[j] in gt[i]:
+                color_accuracy += 1/len(gt[i])
+    return str(color_accuracy)
+
 
 def mostrar_imagenes(imagenes):
     num_imagenes = len(imagenes)
@@ -103,7 +116,45 @@ if __name__ == '__main__':
     imgs, class_labels, color_labels, upper, lower, background = ud.read_extended_dataset()
     cropped_images = ud.crop_images(imgs, upper, lower)
     
-
+    
+    # INICIALITZACIÓ KMEANS
+    
+    color_results = []
+    Kmeans = []
+    for image in test_imgs[:10]:
+        km = KMeans(image,7)
+        km.find_bestK(10)
+        km.fit()
+        Kmeans.append(km)
+        colors = get_colors(np.array([list(km.centroids[0]), list(km.centroids[1]), list(km.centroids[2])]))
+        color_results.append(colors)
+    
+    for Kmean in Kmeans:
+        ay = ud.visualize_k_means(Kmean, [80,60,3])
+        print(Kmean.K)
+    
+    
+    
+    # TEST QUALITATIVE
+    
+    print("Mostrando pantalones negros")
+    pantalones_negros = Retrieval_combined(imgs, class_labels, color_labels, "Jeans", "Black")
+    ud.visualize_retrieval(pantalones_negros, len(pantalones_negros))
+    #mostrar_imagenes(pantalones_negros)
+    
+    print("Mostrando ropa verde")
+    ropa_verde = Retrieval_by_color(imgs[:100], color_labels,"Green")
+    ud.visualize_retrieval(ropa_verde, len(ropa_verde))
+    #mostrar_imagenes(ropa_verde)
+    
+    print("Mostrando vestidos")
+    vestidos = Retrieval_by_shape(imgs[:100], class_labels,"Dresses")
+    ud.visualize_retrieval(vestidos, len(vestidos))
+    #mostrar_imagenes(vestidos)
+    
+    
+    
+    """
     imgs = imgs[:100]
     knn = KNN(imgs, class_labels)
     color_results = []
@@ -136,11 +187,11 @@ if __name__ == '__main__':
     
     for Kmean in Kmeans:
         ud.visualize_k_means(Kmean, (335232,100))
-    """
+    
     WCD, time, iters = Kmean_statistics(Kmeans, 7)
     for wcd, times in zip(WCD, time):
         print(wcd, times)
     print(iters)
-    """
     
+    """
     # You can start coding your functions here
