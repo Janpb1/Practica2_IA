@@ -21,7 +21,7 @@ class KMeans:
         self.centroids = np.zeros((K, self.X.shape[1]))
         self.old_centroids = np.zeros((K, self.X.shape[1]))
         self.labels = np.zeros((K, self.X.shape[1]))
-        #self.WCD = 0
+        self.WCD = 0
         
 
     def _init_X(self, X):
@@ -83,35 +83,22 @@ class KMeans:
 
 
     def first_centroid(self):
-        """
-        #self.centroids = np.zeros((self.K, self.X.shape[1]))
-        selected_pixels = {}
-        centroides = []
-        centroides_iniciats = 0
-        while centroides_iniciats < self.K:
+        self.centroids = np.zeros((self.K, self.X.shape[1]))
+        self.centroids[0] = self.X[0] #Inicialitzem el centroide amb el primer pixel
+        centroide_iniciats = 1 
+        while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
             for pixel in self.X:
-                aux = tuple(pixel)
-                if aux not in selected_pixels:
-                    centroides.append(pixel)
-                    selected_pixels[aux] = 1  # Marcando el píxel como usado para no repetirlo
+                repetit = False
+                #if (np.array_equal(pixel, centroids) for centroids in self.centroids):
+                   #repetit = True 
+                for centroids in self.centroids:
+                    if np.array_equal(pixel, centroids): #Comparem que no sigui un centroide ja agafat
+                        repetit = True
+                if not repetit:
+                    self.centroids[centroide_iniciats] = pixel
+                    centroide_iniciats += 1
                     break
-        
-        self.centroids = np.array(self.centroids)
-        self.old_centroids = np.copy(self.centroids)
-
-        """
-        selected_pixels = {}
-        self.centroids = []
-        for i in range(self.K):
-            for pixel in self.X:
-                aux = tuple(pixel)
-                if aux not in selected_pixels:
-                    self.centroids.append(pixel)
-                    selected_pixels[aux] = 1  # Marking the pixel as used so we don't repeat it
-                    break
-        self.centroids = np.copy(self.centroids)
-        self.old_centroids = np.copy(self.centroids)
-        
+        self.old_centroids = self.centroids        
 
     def random_centroid(self):
         self.centroids[0] = np.random.choice(self.X.flatten()) #Inicialitzem el centroide amb un pixel aleatori
@@ -185,19 +172,7 @@ class KMeans:
             self.get_labels()
             self.get_centroids()
             i+=1
-
-
-    def withinClassDistance(self):
-        """
-        returns the within class distance of the current clustering
-        """
-        #self.WCD  
-        summation = 0 #Sumatorio
-        for point in range(len(self.X)):
-            #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
-            summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
-        self.WCD = (1/len(self.X)) * summation  
-        
+        self.num_iter = i
         
     def withinClassDistance(self):
         """
@@ -208,7 +183,8 @@ class KMeans:
         for point in range(len(self.X)):
             #Agafem el centroide que li pertoca al punt calculat a l'atribut labels i el punt que li correspon dins de l'atribut X
             summation += np.linalg.norm(np.array(self.X[point]) - np.array(self.centroids[self.labels[point]]))**2
-        return (1/len(self.X)) * summation #WCD
+        self.WCD = (1/len(self.X)) * summation
+        return self.WCD #WCD    
         
     def interClassDistance(self):
         """
@@ -255,7 +231,7 @@ class KMeans:
             elif heuristic == 'ICD':
                 dec = 100 * (icd / self.interClassDistance())
             elif heuristic == 'FISHER':
-                dec = 100 * (fisher / self.fisher())
+                dec = 100 * (self.fisher() / fisher)
                 
             #DEC = 100*(self.WCD/wcd)
             #print('WDC: ', self.WCD, 'wdc: ', wcd, '\n')
