@@ -115,6 +115,7 @@ if __name__ == '__main__':
     for Kmean in Kmeans:
         ax = ud.Plot3DCloud(Kmean)
     
+    
     print("Mostrando pantalones negros")
     pantalones_negros = Retrieval_combined(test_imgs, label_results, color_results, "Jeans", "Black")
     ud.visualize_retrieval(pantalones_negros, 1)
