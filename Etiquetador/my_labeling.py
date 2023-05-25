@@ -43,12 +43,15 @@ def Retrieval_combined(list_img, shape_labels, color_labels, shape_question, col
 
 def Kmean_statistics(Kmeans_list, Kmax):
     WCD = []
+    ICD = []
+    FISHER = []
     iters = []
     time = []
     clusters = []
-    
     for i in range(len(Kmeans_list)):
         WCD_list = []
+        ICD_list =[]
+        FISHER_list = []
         time_list = []
         iters_list = []
         k = []
@@ -61,15 +64,21 @@ def Kmean_statistics(Kmeans_list, Kmax):
             temps = final - inici 
             time_list.append(temps)
             Kmeans.withinClassDistance()
+            Kmeans.interClassDistance()
+            Kmeans.fisher()
             WCD_list.append(Kmeans.WCD)
+            ICD_list.append(Kmeans.ICD)
+            FISHER_list.append(Kmeans.FISHER)
             iters_list.append(Kmeans.num_iter)
             k.append(j)
         WCD.append(WCD_list)
+        ICD.append(ICD_list)
+        FISHER.append(FISHER_list)
         time.append(time_list)
         iters.append(iters_list)
         clusters.append(k)
         
-    return WCD, time, iters, clusters
+    return WCD, ICD, FISHER, time, iters, clusters
 
 def get_shape_accuracy(classes, gt):
     ret = 0
@@ -117,7 +126,134 @@ def test_qualitatiu(class_labels, color_labels):
     vestidos = Retrieval_by_shape(imgs[:100], class_labels, ["Dresses"])
     ud.visualize_retrieval(vestidos, len(vestidos))
     #mostrar_imagenes(vestidos)
+def test_quantitatiu(Kmeans):
+    mostrar_K_statisticd(Kmeans)
     
+def mostrar_K_statisticd(Kmeans):
+    WCD, ICD, FISHER, time, iters, k = Kmean_statistics(Kmeans, 7)
+    fig1, axs1 = plt.subplots(1)
+    fig2, axs2 = plt.subplots(1)
+    fig3, axs3 = plt.subplots(1)
+    fig4, axs4 = plt.subplots(1)
+    fig5, axs5 = plt.subplots(1)
+    fig6, axs6 = plt.subplots(1)
+    fig7, axs7 = plt.subplots(1)
+    fig8, axs8 = plt.subplots(1)
+    fig9, axs9 = plt.subplots(1)
+    
+    axs1.set_title("WCD Kmeans")
+    axs1.set_xlabel("Clusters")
+    axs1.set_ylabel("Iterations")
+    axs2.set_title("WCD Kmeans")
+    axs2.set_xlabel("Clusters")
+    axs2.set_ylabel("WCD")
+    axs3.set_title("WCD Kmeans")
+    axs3.set_xlabel("WCD")
+    axs3.set_ylabel("Iterations")
+    axs4.set_title("ICD Kmeans")
+    axs4.set_xlabel("Clusters")
+    axs4.set_ylabel("Iterations")
+    axs5.set_title("ICD Kmeans")
+    axs5.set_xlabel("Clusters")
+    axs5.set_ylabel("ICD")
+    axs6.set_title("ICD Kmeans")
+    axs6.set_xlabel("ICD")
+    axs6.set_ylabel("Iterations")
+    axs7.set_title("FISHER Kmeans")
+    axs7.set_xlabel("Clusters")
+    axs7.set_ylabel("Iterations")
+    axs8.set_title("FISHER Kmeans")
+    axs8.set_xlabel("Clusters")
+    axs8.set_ylabel("FISHER")
+    axs9.set_title("FISHER Kmeans")
+    axs9.set_xlabel("FISHER")
+    axs9.set_ylabel("Iterations")
+    
+    media_WCD = [0 for i in range(len(WCD[0]))]
+    media_ICD = [0 for i in range(len(WCD[0]))]
+    media_FISHER = [0 for i in range(len(WCD[0]))]
+    media_iters = [0 for i in range(len(WCD[0]))]
+    media_clusters = [0 for i in range(len(WCD[0]))]
+    
+    for wcd, icd, fisher, times, iteration, clusters in zip(WCD, ICD, FISHER, time, iters, k):
+        axs1.plot(clusters, iteration)
+        axs2.plot(clusters, wcd)
+        axs3.plot(wcd, iteration)
+        axs4.plot(clusters, iteration)
+        axs5.plot(clusters, icd)
+        axs6.plot(icd, iteration)
+        axs7.plot(clusters, iteration)
+        axs8.plot(clusters, fisher)
+        axs9.plot(fisher, iteration)
+        i = 0
+        for i in range(len(wcd)):
+            media_WCD[i] += wcd[i]
+            media_ICD[i] += icd[i]
+            media_FISHER[i] += fisher[i]
+            media_iters[i] += iteration[i]
+            media_clusters[i] += clusters[i]
+    
+    plt.show()
+    
+    for i in range(len(media_WCD)):
+        media_WCD[i] /= len(WCD[i])
+        media_ICD[i] /= len(ICD[i])
+        media_FISHER[i] /= len(FISHER[i])
+        media_iters[i] /= len(iters[i])
+        media_clusters[i] /= len(k[i])
+    mostrar_medias(media_WCD, media_ICD, media_FISHER, media_iters, media_clusters)
+    
+    
+def mostrar_medias(wcd, icd, fisher, iteration, clusters):
+    fig1, axs1 = plt.subplots(1)
+    fig2, axs2 = plt.subplots(1)
+    fig3, axs3 = plt.subplots(1)
+    fig4, axs4 = plt.subplots(1)
+    fig5, axs5 = plt.subplots(1)
+    fig6, axs6 = plt.subplots(1)
+    fig7, axs7 = plt.subplots(1)
+    fig8, axs8 = plt.subplots(1)
+    fig9, axs9 = plt.subplots(1)
+    
+    axs1.set_title("WCD Kmeans")
+    axs1.set_xlabel("Clusters")
+    axs1.set_ylabel("Iterations")
+    axs2.set_title("WCD Kmeans")
+    axs2.set_xlabel("Clusters")
+    axs2.set_ylabel("WCD")
+    axs3.set_title("WCD Kmeans")
+    axs3.set_xlabel("WCD")
+    axs3.set_ylabel("Iterations")
+    axs4.set_title("ICD Kmeans")
+    axs4.set_xlabel("Clusters")
+    axs4.set_ylabel("Iterations")
+    axs5.set_title("ICD Kmeans")
+    axs5.set_xlabel("Clusters")
+    axs5.set_ylabel("ICD")
+    axs6.set_title("ICD Kmeans")
+    axs6.set_xlabel("ICD")
+    axs6.set_ylabel("Iterations")
+    axs7.set_title("FISHER Kmeans")
+    axs7.set_xlabel("Clusters")
+    axs7.set_ylabel("Iterations")
+    axs8.set_title("FISHER Kmeans")
+    axs8.set_xlabel("Clusters")
+    axs8.set_ylabel("FISHER")
+    axs9.set_title("FISHER Kmeans")
+    axs9.set_xlabel("FISHER")
+    axs9.set_ylabel("Iterations")
+    
+    axs1.plot(clusters, iteration)
+    axs2.plot(clusters, wcd)
+    axs3.plot(wcd, iteration)
+    axs4.plot(clusters, iteration)
+    axs5.plot(clusters, icd)
+    axs6.plot(icd, iteration)
+    axs7.plot(clusters, iteration)
+    axs8.plot(clusters, fisher)
+    axs9.plot(fisher, iteration)
+    
+    plt.show()
 
 if __name__ == '__main__':
     
@@ -133,24 +269,24 @@ if __name__ == '__main__':
     cropped_images = ud.crop_images(imgs, upper, lower)
     
     # INICIALITZACIÓ KMEANS
-    """
-    color_results = []
+    
     Kmeans = []
     for image in test_imgs[:10]:
-        km = KMeans(image,7)
-        km.find_bestK(10,'FISHER')
+        km = KMeans(image)
+        km.find_bestK(10)
         km.fit()
         Kmeans.append(km)
 
     for Kmean in Kmeans:
         ay = ud.visualize_k_means(Kmean, [80,60,3])
         print(Kmean.K)
-    """
+    
     #test_qualitatiu(class_labels, color_labels)
-    #test_quantitatiu()
+    test_quantitatiu(Kmeans)
     #knn = KNN(train_imgs, test_class_labels)
     #knn_labels = knn.predict(test_imgs, 3)
-
+    
+    """
     #Quantitative functions
     n_images_s = 150
     total_trobats = []
@@ -165,19 +301,5 @@ if __name__ == '__main__':
             total_trobats.extend(trobats)
     
     #get_shape_accuracy(total_trobats, test_class_labels)
-
     """
-    WCD, time, iters, k = Kmean_statistics(Kmeans, 7)
-    fig, axs = plt.subplots(2)
-    axs[0].set_title("Avaluation Kmeans")
-    axs[0].set_xlabel("WCD")
-    axs[0].set_ylabel("Iterations")
-    axs[1].set_xlabel("Clusters")
-    axs[1].set_ylabel("WCD")
-    i = 1
-    for wcd, times, iteration, clusters in zip(WCD, time, iters, k):
-        axs[0].plot(wcd, times)
-        axs[1].plot(clusters, wcd)
-        i += 1
-    plt.show()
-    """
+    
