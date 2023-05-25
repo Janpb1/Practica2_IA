@@ -1,5 +1,5 @@
-__authors__ = ['1639484','1636492','1638248']
-__group__ = 'DJ.12'
+__authors__ = 'TO_BE_FILLED'
+__group__ = 'TO_BE_FILLED'
 
 import utils_data as ud
 import numpy as np
@@ -8,6 +8,7 @@ from Kmeans import *
 from KNN import *
 import time as t
 import matplotlib.pyplot as plt
+import random
 
 """ INICI ANALISI QUALITATIU """
 
@@ -44,10 +45,13 @@ def Kmean_statistics(Kmeans_list, Kmax):
     WCD = []
     iters = []
     time = []
+    clusters = []
     
     for i in range(len(Kmeans_list)):
         WCD_list = []
         time_list = []
+        iters_list = []
+        k = []
         Kmeans = Kmeans_list[i]
         for j in range(2, Kmax):
             Kmeans.K = j
@@ -58,24 +62,28 @@ def Kmean_statistics(Kmeans_list, Kmax):
             time_list.append(temps)
             Kmeans.withinClassDistance()
             WCD_list.append(Kmeans.WCD)
+            iters_list.append(Kmeans.num_iter)
+            k.append(j)
         WCD.append(WCD_list)
         time.append(time_list)
-        iters.append(Kmeans.num_iter)
+        iters.append(iters_list)
+        clusters.append(k)
         
-    return WCD, time, iters
+    return WCD, time, iters, clusters
 
 def get_shape_accuracy(classes, gt):
-    return str(sum(1 for x, y in zip(labels, gt) if x == y)/len(labels))
-
+    ret = 0
+    for clase in classes:
+        if clase in gt:
+           ret += 1
+    return ret / len(classes)
 
 def get_color_accuracy(colors, gt):
-    color_accuracy = 0
-    for i in range(len(labels)):
-        labels_set = list(set(labels[i]))
-        for j in range(len(set(labels_set))):
-            if labels_set[j] in gt[i]:
-                color_accuracy += 1/len(gt[i])
-    return str(color_accuracy)
+    ret = 0
+    for i in range(len(colors)):
+        if colors[i] == gt[i]:
+           ret += 1
+    return ret / len(classes)
 
 """ FI ANALISI QUANTITATIU """
 
@@ -96,20 +104,21 @@ def mostrar_imagenes(imagenes):
 def test_qualitatiu(class_labels, color_labels):
     # TEST QUALITATIVE
     print("Mostrando pantalones negros")
-    black_jeans = Retrieval_combined(imgs, class_labels, color_labels, "Jeans", "Black")
+    black_jeans = Retrieval_combined(imgs, class_labels, color_labels, ["Jeans"], ["Black"])
     ud.visualize_retrieval(black_jeans, len(black_jeans))
     #mostrar_imagenes(pantalones_negros)
     
     print("Mostrando ropa verde")
-    ropa_verde = Retrieval_by_color(imgs[:100], color_labels,"Green")
+    ropa_verde = Retrieval_by_color(imgs[:100], color_labels, ["Green"])
     ud.visualize_retrieval(ropa_verde, len(ropa_verde))
     #mostrar_imagenes(ropa_verde)
     
     print("Mostrando vestidos")
-    vestidos = Retrieval_by_shape(imgs[:100], class_labels,"Dresses")
+    vestidos = Retrieval_by_shape(imgs[:100], class_labels, ["Dresses"])
     ud.visualize_retrieval(vestidos, len(vestidos))
     #mostrar_imagenes(vestidos)
     
+
 if __name__ == '__main__':
     
     # Load all the images and GT
@@ -123,9 +132,8 @@ if __name__ == '__main__':
     imgs, class_labels, color_labels, upper, lower, background = ud.read_extended_dataset()
     cropped_images = ud.crop_images(imgs, upper, lower)
     
-    
     # INICIALITZACIÓ KMEANS
-    
+    """
     color_results = []
     Kmeans = []
     for image in test_imgs[:10]:
@@ -137,47 +145,39 @@ if __name__ == '__main__':
     for Kmean in Kmeans:
         ay = ud.visualize_k_means(Kmean, [80,60,3])
         print(Kmean.K)
-    
-    
+    """
     #test_qualitatiu(class_labels, color_labels)
+    #test_quantitatiu()
+    #knn = KNN(train_imgs, test_class_labels)
+    #knn_labels = knn.predict(test_imgs, 3)
+
+    #Quantitative functions
+    n_images_s = 150
+    total_trobats = []
+    for it in range(0, 125):
+            ti = random.randrange(10, 100)
+            knn = KNN(train_imgs[:ti], train_class_labels[:ti])
+            preds = knn.predict(test_imgs[:n_images_s], 4)
+            
+            trobats = Retrieval_by_shape(test_imgs[:n_images_s], preds, ["Dresses"])
+            print(get_shape_accuracy(trobats, ["Dresses"]))
+            ud.visualize_retrieval(trobats, len(trobats))
+            total_trobats.extend(trobats)
+    
+    #get_shape_accuracy(total_trobats, test_class_labels)
 
     """
-    imgs = imgs[:100]
-    knn = KNN(imgs, class_labels)
-    color_results = []
-    label_results = knn.predict(test_imgs, 10)
-    Kmeans = []
-    for image in test_imgs:
-        km = KMeans(image, 7)
-        km.fit()    
-        Kmeans.append(km)
-        colors = get_colors(np.array([list(km.centroids[0]), list(km.centroids[1]), list(km.centroids[2])]))
-        color_results.append(colors)
-    
-    for Kmean in Kmeans:
-        ax = ud.Plot3DCloud(Kmean)
-    
-    print("Mostrando pantalones negros")
-    pantalones_negros = Retrieval_combined(test_imgs, label_results, color_results, "Jeans", "Black")
-    ud.visualize_retrieval(pantalones_negros, 1)
-    #mostrar_imagenes(pantalones_negros)
-    
-    print("Mostrando ropa verde")
-    ropa_verde = Retrieval_by_color(test_imgs[:100], color_results,"Green")
-    ud.visualize_retrieval(ropa_verde, 1)
-    #mostrar_imagenes(ropa_verde)
-    
-    print("Mostrando vestidos")
-    vestidos = Retrieval_by_shape(test_imgs[:100], label_results,"Dresses")
-    ud.visualize_retrieval(vestidos, 1)
-    #mostrar_imagenes(vestidos)
-    
-    for Kmean in Kmeans:
-        ud.visualize_k_means(Kmean, (335232,100))
+    WCD, time, iters, k = Kmean_statistics(Kmeans, 7)
+    fig, axs = plt.subplots(2)
+    axs[0].set_title("Avaluation Kmeans")
+    axs[0].set_xlabel("WCD")
+    axs[0].set_ylabel("Iterations")
+    axs[1].set_xlabel("Clusters")
+    axs[1].set_ylabel("WCD")
+    i = 1
+    for wcd, times, iteration, clusters in zip(WCD, time, iters, k):
+        axs[0].plot(wcd, times)
+        axs[1].plot(clusters, wcd)
+        i += 1
+    plt.show()
     """
-    WCD, time, iters = Kmean_statistics(Kmeans, 7)
-    for wcd, times in zip(WCD, time):
-        print(wcd, times)
-    print(iters)
-    
-    # You can start coding your functions here
