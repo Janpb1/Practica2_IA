@@ -1,5 +1,5 @@
-__authors__ = 'TO_BE_FILLED'
-__group__ = 'TO_BE_FILLED'
+__authors__ = ['1639484','1636492','1638248']
+__group__ = 'DJ.12'
 
 import utils_data as ud
 import numpy as np
@@ -130,7 +130,7 @@ def test_quantitatiu(Kmeans):
     mostrar_K_statisticd(Kmeans)
     
 def mostrar_K_statisticd(Kmeans):
-    WCD, ICD, FISHER, time, iters, k = Kmean_statistics(Kmeans, 7)
+    WCD, ICD, FISHER, time, iters, k = Kmean_statistics(Kmeans, 10)
     fig1, axs1 = plt.subplots(1)
     fig2, axs2 = plt.subplots(1)
     fig3, axs3 = plt.subplots(1)
