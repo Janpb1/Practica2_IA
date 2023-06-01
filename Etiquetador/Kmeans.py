@@ -22,6 +22,8 @@ class KMeans:
         self.old_centroids = np.zeros((K, self.X.shape[1]))
         self.labels = np.zeros((K, self.X.shape[1]))
         self.WCD = 0
+        self.ICD = 0
+        self.FISHER = 0
         
 
     def _init_X(self, X):
@@ -101,25 +103,27 @@ class KMeans:
         self.old_centroids = self.centroids        
 
     def random_centroid(self):
-        self.centroids[0] = np.random.choice(self.X.flatten()) #Inicialitzem el centroide amb un pixel aleatori
-        centroide_iniciats = 1 
+        centroids = []
+        centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem el centroide amb un pixel aleatori
+        centroide_iniciats = 1
         while centroide_iniciats < self.K: #Comparem amb self.K ja que es el numero de centroides
             centroide_aleatori = np.random.choice(self.X.flatten()) #Fem servir el flatten per posar tots els valors en un array
-            if centroide_aleatori not in self.centroide: #Comparem que no sigui un centroide ja agafat
-                self.centroids[centroide_iniciats] = centroide_aleatori
+            if centroide_aleatori not in self.centroids: #Comparem que no sigui un centroide ja agafat
+                centroids.append(centroide_aleatori)
                 centroide_iniciats += 1
+        self.centroids = np.array(centroids)
         self.old_centroids = self.centroids
 
     def custom_centroid(self):
-        #Utilitzarem el KMeans++ per a la busqueda dels centroids com a opció random
-        self.centroids.append(np.random.choice(self.X.flatten())) #Inicialitzem amb un centroid aleatori
-        centroide_iniciats = 1 
-        while centroide_iniciats < self.K:
-            distancies = np.array([min([np.linalg.norm(x-c) for c in self.centroids]) for x in self.X]) #Es calcula les distancies de tots els punts fins al centroid escollit
-            probabilitats = distancies / np.sum(distancies)
-            self.centroids.append(np.random.choice((self.X.flatten()),p=probabilitats)) #S'escull el centroid segons la probabilitat de la distancia entre el nou i el vell centroid
-        
-        self.old_centroids = self.centroids
+        repetits = True
+        while repetits:
+            self.centroids = np.random.rand(self.K, self.X.shape[1])
+
+            repetits = False
+            for i in range(self.K):
+                for j in range(i + 1, self.K):
+                    if np.all(self.centroids[i] == self.centroids[j]):
+                        repetits = True
 
 
     def get_labels(self):
@@ -204,10 +208,12 @@ class KMeans:
                 if centroid2 != centroid:
                     c.append(self.centroids[centroid2])
             for centroid3 in c:
-                summation += np.sum((self.X[points] - centroid3) ** 2) 
+                summation += np.sum((self.X[points] - centroid3) ** 2)
+        self.ICD = summation/len(self.X)
         return summation/len(self.X)
                                             
     def fisher(self):
+        self.FISHER = self.withinClassDistance() / self.interClassDistance()
         return self.withinClassDistance() / self.interClassDistance() #Fisher
     
     def find_bestK(self, max_K, heuristic = 'WCD'):
@@ -237,7 +243,7 @@ class KMeans:
             #print('WDC: ', self.WCD, 'wdc: ', wcd, '\n')
             #print('DEC: ', DEC, '100-DEC = ', 100-DEC, '\n')
             
-            if (100 - dec) <= 20: #20% llindar per determinar estabilització
+            if (100 - dec) <= 20: #20% llindar per determinar estabilitzaciÃ³
                 self.K -= 1
                 break
             else:
