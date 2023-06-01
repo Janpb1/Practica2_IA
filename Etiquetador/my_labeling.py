@@ -160,8 +160,8 @@ def mostrar_shape_accuracy(knn):
 
 def get_color_accuracy(kmeans_labels, Ground_Truth):
     count = 0
-    for km_label, gt_label in zip(kmeans_labels, Ground_Truth):
-        if km_label == gt_label:
+    for predict in kmeans_labels:
+        if predict in Ground_Truth:
             count += 1
     return 100*(count / len(kmeans_labels))
 
@@ -199,9 +199,32 @@ def test_qualitatiu(class_labels, color_labels):
     ud.visualize_retrieval(val, len(val))
 
 """VISUALITZACIÓ ANALISIS QUANTITATIU"""
-def test_quantitatiu(Kmeans, knn):
-    mostrar_K_statisticd(Kmeans)
-    mostrar_shape_accuracy(knn)
+def test_quantitatiu(Kmeans, knn, test_imgs, test_color_labels):
+    #mostrar_K_statisticd(Kmeans)
+    #mostrar_shape_accuracy(knn)
+    Kmeans = []
+    K = []
+    mitjana = []
+    for k in range(2,10):
+        kmeans_k = []
+        for image in test_imgs:
+            km = KMeans(image)
+            km.K = k
+            km.fit()
+            kmeans_k.append(km)
+        Kmeans.append(kmeans_k)
+        K.append(k)
+    for kmeans_k in Kmeans:
+        x = 0
+        for kmeans, test in zip(kmeans_k, test_color_labels):
+            x += get_color_accuracy(get_colors(kmeans.centroids), test)
+        mitjana.append(x/len(kmeans_k))
+        print(x/len(kmeans_k))
+    plt.title("Kmeans color accuracy")
+    plt.xlabel("K")
+    plt.ylabel("Accuracy")
+    plt.plot(K, mitjana)
+    plt.show()
     
     
 if __name__ == '__main__':
@@ -216,6 +239,7 @@ if __name__ == '__main__':
     # Load extended ground truth
     imgs, class_labels, color_labels, upper, lower, background = ud.read_extended_dataset()
     cropped_images = ud.crop_images(imgs, upper, lower)
+    
 
     heuristiques = ['WCD', 'ICD', 'FISHER']
     # INICIALITZACIÓ KMEANS
@@ -238,15 +262,8 @@ if __name__ == '__main__':
     #INICIALITZACIÓ KNN
     knn = KNN(train_imgs, train_class_labels)
     
+    
     # TEST QUANTITATIU
-    test_quantitatiu(Kmeans, knn)
-
-    """Kmeans = []
-    for image in test_imgs[:10]:
-        km = KMeans(image)
-        km.fit()
-        Kmeans.append(km)
-    kmeans_labels = []
-    for i in range(len(Kmeans)):
-        kmeans_labels.append(list(get_colors(Kmeans[i].centroids)))
-    get_color_accuracy(kmeans_labels, test_color_labels[:10])"""
+    test_quantitatiu(Kmeans, knn, test_imgs, test_color_labels)
+    
+    
