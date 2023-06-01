@@ -190,15 +190,15 @@ if __name__ == '__main__':
         km.find_bestK(10, 'FISHER')
         km.fit()
         Kmeans.append(km)
-    """
+    
     for Kmean in Kmeans:
         ay = ud.visualize_k_means(Kmean, [80,60,3])
         print(Kmean.K)
-    """
+    
     #test_qualitatiu(class_labels, color_labels)
     test_quantitatiu(Kmeans)
-    #knn = KNN(train_imgs, test_class_labels)
-    #knn_labels = knn.predict(test_imgs, 3)
+    knn = KNN(train_imgs, train_class_labels)
+    knn_labels = knn.predict(test_imgs, 4)
     
     """
     #Quantitative functions
