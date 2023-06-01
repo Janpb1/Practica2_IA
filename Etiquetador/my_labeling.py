@@ -133,12 +133,12 @@ def mostrar_medias(wcd, icd, fisher, iteration, clusters):
     
     plt.show()
 
-def get_shape_accuracy(classes, gt):
+def get_shape_accuracy(knn_labels, Ground_Truth):
     count = 0
-    for predict, clase in zip(classes, gt):
+    for predict, clase in zip(knn_labels, Ground_Truth):
         if predict == clase:
             count += 1
-    return 100*(count / len(classes))
+    return 100*(count / len(knn_labels))
 
 def mostrar_shape_accuracy(knn):
     porcentajes = []
@@ -156,14 +156,14 @@ def mostrar_shape_accuracy(knn):
     plt.ylabel("Accuracy")
     plt.plot(K, porcentajes)
     plt.show()
-    
-        
-def get_color_accuracy(colors, gt):
-    ret = 0
-    for i in range(len(colors)):
-        if colors[i] == gt[i]:
-            ret += 1
-    return ret /  len(colors)
+
+
+def get_color_accuracy(kmeans_labels, Ground_Truth):
+    count = 0
+    for km_label, gt_label in zip(kmeans_labels, Ground_Truth):
+        if km_label == gt_label:
+            count += 1
+    return 100*(count / len(kmeans_labels))
 
 """ FI ANALISI QUANTITATIU """
 
@@ -240,3 +240,13 @@ if __name__ == '__main__':
     
     # TEST QUANTITATIU
     test_quantitatiu(Kmeans, knn)
+
+    """Kmeans = []
+    for image in test_imgs[:10]:
+        km = KMeans(image)
+        km.fit()
+        Kmeans.append(km)
+    kmeans_labels = []
+    for i in range(len(Kmeans)):
+        kmeans_labels.append(list(get_colors(Kmeans[i].centroids)))
+    get_color_accuracy(kmeans_labels, test_color_labels[:10])"""
