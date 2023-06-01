@@ -63,7 +63,6 @@ def Kmean_statistics(Kmeans_list, Kmax):
             temps = final - inici 
             time_list.append(temps)
             Kmeans.withinClassDistance()
-            
             Kmeans.interClassDistance()
             Kmeans.fisher()
             WCD_list.append(Kmeans.WCD)
@@ -79,61 +78,6 @@ def Kmean_statistics(Kmeans_list, Kmax):
         clusters.append(k)
         
     return WCD, ICD, FISHER, time, iters, clusters
-
-
-def get_shape_accuracy(classes, gt):
-    count = 0
-    for predict, clase in zip(classes, gt):
-        if predict == clase:
-            count += 1
-    return 100*(count / len(classes))
-
-
-def get_color_accuracy(colors, gt):
-    ret = 0
-    for i in range(len(colors)):
-        if colors[i] == gt[i]:
-            ret += 1
-    return ret /  len(colors)
-
-#INSPIRACION
-"""
-def get_shape_accuracy(knn_labels, shape_labels):
-
-    accuracy = 100*sum(1 for x, y in zip(sorted(knn_labels), sorted(shape_labels)) if x == y) / len(knn_labels)
-    print(accuracy)
-
-
-def get_color_accuracy(kmeans_labels, color_labels):
-    accuracy = 100 * sum(1 for x, y in zip(sorted(kmeans_labels), sorted(color_labels)) if x == y) / len(kmeans_labels)
-    print(accuracy)
-"""
-""" FI ANALISI QUANTITATIU """
-
-
-def test_qualitatiu(class_labels, color_labels):
-    # TEST QUALITATIVE
-    print("Mostrando pantalones negros")
-    black_jeans = Retrieval_combined(imgs, class_labels, color_labels, ["Jeans"], ["Black"])
-    ud.visualize_retrieval(black_jeans, len(black_jeans))
-    #mostrar_imagenes(pantalones_negros)
-    
-    print("Mostrando ropa verde")
-    ropa_verde = Retrieval_by_color(imgs[:100], color_labels, ["Green"])
-    ud.visualize_retrieval(ropa_verde, len(ropa_verde))
-    #mostrar_imagenes(ropa_verde)
-    
-    print("Mostrando vestidos")
-    vestidos = Retrieval_by_shape(imgs[:100], class_labels, ["Dresses"])
-    ud.visualize_retrieval(vestidos, len(vestidos))
-    #mostrar_imagenes(vestidos)
-
-
-def test_quantitatiu(Kmeans, knn):
-    mostrar_K_statisticd(Kmeans)
-
-    mostrar_shape_acuracy(knn)
-    
 
 
 def mostrar_K_statisticd(Kmeans):
@@ -160,19 +104,8 @@ def mostrar_K_statisticd(Kmeans):
         media_iters[i] /= len(iters[i])
         media_clusters[i] /= len(k[i])
         
-    mostrar_medias(media_WCD, media_ICD, media_FISHER, media_iters, media_clusters)
+    mostrar_medias(media_WCD, media_ICD, media_FISHER, media_iters, media_clusters)  
 
-
-def mostrar_shape_acuracy(knn):
-    porcentajes = []
-    for k in range(2, 10):
-        knn_labels = knn.predict(test_imgs, k)
-        x = get_shape_accuracy(knn_labels, test_class_labels)
-        porcentajes.append(x)
-        knn.neighbors=[]
-        print(x)
-    
-    
 
 def mostrar_medias(wcd, icd, fisher, iteration, clusters):
     fig1, axs1 = plt.subplots(1)
@@ -200,12 +133,82 @@ def mostrar_medias(wcd, icd, fisher, iteration, clusters):
     
     plt.show()
 
+def get_shape_accuracy(classes, gt):
+    count = 0
+    for predict, clase in zip(classes, gt):
+        if predict == clase:
+            count += 1
+    return 100*(count / len(classes))
 
+def mostrar_shape_accuracy(knn):
+    porcentajes = []
+    K = []
+    for k in range(3, 15):
+        knn_labels = knn.predict(test_imgs, k)
+        x = get_shape_accuracy(knn_labels, test_class_labels)
+        porcentajes.append(x)
+        K.append(k)
+        knn.neighbors=[]
+        print("Per a K = ", k, " el percentatge d'encerts és ",x)
+
+    plt.title("KNN shape accuracy")
+    plt.xlabel("K")
+    plt.ylabel("Accuracy")
+    plt.plot(K, porcentajes)
+    plt.show()
+    
+        
+def get_color_accuracy(colors, gt):
+    ret = 0
+    for i in range(len(colors)):
+        if colors[i] == gt[i]:
+            ret += 1
+    return ret /  len(colors)
+
+""" FI ANALISI QUANTITATIU """
+
+"""VISUALITZACIÓ ANALISIS QALITATIU"""
+def test_qualitatiu(class_labels, color_labels):
+    # TEST QUALITATIVE
+    print("Mostrando pantalones negros")
+    val = Retrieval_combined(imgs, class_labels, color_labels, ["Jeans"], ["Black"])
+    ud.visualize_retrieval(val, len(val))
+    
+    print("Mostrando vestidos rosas y azules")
+    val = Retrieval_combined(imgs, class_labels, color_labels, ["Dresses"], ["Pink", "Blue"])
+    ud.visualize_retrieval(val, len(val))
+    
+    print("Mostrando vestidos y sandalias rosas ")
+    val = Retrieval_combined(imgs, class_labels, color_labels, ["Dresses", "Sandals"], ["Pink"])
+    ud.visualize_retrieval(val, len(val))
+    
+    print("Mostrando ropa rosa")
+    val = Retrieval_by_color(imgs[:30], color_labels, ["Pink"])
+    ud.visualize_retrieval(val, len(val))
+    
+    print("Mostrando ropa blanca y azul")
+    val = Retrieval_by_color(imgs[:30], color_labels, ["White", "Blue"])
+    ud.visualize_retrieval(val, len(val))
+    
+    print("Mostrando vaqueros")
+    val = Retrieval_by_shape(imgs[:30], class_labels, ["Jeans"])
+    ud.visualize_retrieval(val, len(val))
+    
+    print("Mostrando calcetines y bolsas")
+    val = Retrieval_by_shape(imgs[:30], class_labels, ["Socks", "Handbags"])
+    ud.visualize_retrieval(val, len(val))
+
+"""VISUALITZACIÓ ANALISIS QUANTITATIU"""
+def test_quantitatiu(Kmeans, knn):
+    mostrar_K_statisticd(Kmeans)
+    mostrar_shape_accuracy(knn)
+    
+    
 if __name__ == '__main__':
     
     # Load all the images and GT
     train_imgs, train_class_labels, train_color_labels, test_imgs, test_class_labels, \
-        test_color_labels = ud.read_dataset(root_folder='./Etiquetador/images/', gt_json='./Etiquetador/images/gt.json')
+        test_color_labels = ud.read_dataset(root_folder='./images/', gt_json='./images/gt.json')
 
     # List with all the existent classes
     classes = list(set(list(train_class_labels) + list(test_class_labels)))
@@ -214,44 +217,26 @@ if __name__ == '__main__':
     imgs, class_labels, color_labels, upper, lower, background = ud.read_extended_dataset()
     cropped_images = ud.crop_images(imgs, upper, lower)
 
-    """
+    heuristiques = ['WCD', 'ICD', 'FISHER']
     # INICIALITZACIÓ KMEANS
-    Kmeans = []
-    for image in test_imgs[:10]:
-        km = KMeans(image)
-        km.find_bestK(10, 'FISHER')
-        km.fit()
-        Kmeans.append(km)
-    
-    
-    # VISUALIZAR KMEANS
-    for Kmean in Kmeans:
-        ay = ud.visualize_k_means(Kmean, [80,60,3])
-        print(Kmean.K)
+    for heuristica in heuristiques:
+        Kmeans = []
+        for image in test_imgs[:10]:
+            km = KMeans(image)
+            km.find_bestK(10, heuristica)
+            km.fit()
+            Kmeans.append(km)
+        
+        # VISUALIZAR KMEANS
+        for Kmean in Kmeans:
+            ay = ud.visualize_k_means(Kmean, [80,60,3])
+            print(Kmean.K)
     
     # TESTS QUALITATIUS
     test_qualitatiu(class_labels, color_labels)
     
-    
-    # TEST QUANTITATIU
-    test_quantitatiu(Kmeans, knn)
-    """
     #INICIALITZACIÓ KNN
     knn = KNN(train_imgs, train_class_labels)
     
-    mostrar_shape_acuracy(knn)
-    
-    """
-    knn_labels = knn.predict(test_imgs, 3)
-    x = get_shape_accuracy(knn_labels, test_class_labels)
-
-    knn_labels = knn.predict(test_imgs, 4)
-    x = get_shape_accuracy(knn_labels, test_class_labels)
-    
-    
-    print(len(knn_labels), x)
-
-    """
-
-    
-    
+    # TEST QUANTITATIU
+    test_quantitatiu(Kmeans, knn)
