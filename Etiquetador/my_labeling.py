@@ -82,11 +82,11 @@ def Kmean_statistics(Kmeans_list, Kmax):
 
 
 def get_shape_accuracy(classes, gt):
-    ret = 0
-    for clase in classes:
-        if clase in gt:
-            ret += 1
-    return ret / len(classes)
+    count = 0
+    for predict, clase in zip(classes, gt):
+        if predict == clase:
+            count += 1
+    return 100*(count / len(classes))
 
 
 def get_color_accuracy(colors, gt):
@@ -94,7 +94,7 @@ def get_color_accuracy(colors, gt):
     for i in range(len(colors)):
         if colors[i] == gt[i]:
             ret += 1
-    return ret / len(classes)
+    return ret /  len(colors)
 
 #INSPIRACION
 """
@@ -129,8 +129,11 @@ def test_qualitatiu(class_labels, color_labels):
     #mostrar_imagenes(vestidos)
 
 
-def test_quantitatiu(Kmeans):
+def test_quantitatiu(Kmeans, knn):
     mostrar_K_statisticd(Kmeans)
+
+    mostrar_shape_acuracy(knn)
+    
 
 
 def mostrar_K_statisticd(Kmeans):
@@ -159,6 +162,17 @@ def mostrar_K_statisticd(Kmeans):
         
     mostrar_medias(media_WCD, media_ICD, media_FISHER, media_iters, media_clusters)
 
+
+def mostrar_shape_acuracy(knn):
+    porcentajes = []
+    for k in range(2, 10):
+        knn_labels = knn.predict(test_imgs, k)
+        x = get_shape_accuracy(knn_labels, test_class_labels)
+        porcentajes.append(x)
+        knn.neighbors=[]
+        print(x)
+    
+    
 
 def mostrar_medias(wcd, icd, fisher, iteration, clusters):
     fig1, axs1 = plt.subplots(1)
@@ -191,7 +205,7 @@ if __name__ == '__main__':
     
     # Load all the images and GT
     train_imgs, train_class_labels, train_color_labels, test_imgs, test_class_labels, \
-        test_color_labels = ud.read_dataset(root_folder='./images/', gt_json='./images/gt.json')
+        test_color_labels = ud.read_dataset(root_folder='./Etiquetador/images/', gt_json='./Etiquetador/images/gt.json')
 
     # List with all the existent classes
     classes = list(set(list(train_class_labels) + list(test_class_labels)))
@@ -200,7 +214,7 @@ if __name__ == '__main__':
     imgs, class_labels, color_labels, upper, lower, background = ud.read_extended_dataset()
     cropped_images = ud.crop_images(imgs, upper, lower)
 
-
+    """
     # INICIALITZACIÓ KMEANS
     Kmeans = []
     for image in test_imgs[:10]:
@@ -209,7 +223,7 @@ if __name__ == '__main__':
         km.fit()
         Kmeans.append(km)
     
-    """
+    
     # VISUALIZAR KMEANS
     for Kmean in Kmeans:
         ay = ud.visualize_k_means(Kmean, [80,60,3])
@@ -217,29 +231,27 @@ if __name__ == '__main__':
     
     # TESTS QUALITATIUS
     test_qualitatiu(class_labels, color_labels)
-    """
+    
     
     # TEST QUANTITATIU
-    test_quantitatiu(Kmeans)
-
+    test_quantitatiu(Kmeans, knn)
+    """
     #INICIALITZACIÓ KNN
     knn = KNN(train_imgs, train_class_labels)
-    knn_labels = knn.predict(test_imgs, 4)
-    print("Inicializado KNN")
-    """
-    #Quantitative functions
-    n_images_s = 150
-    total_trobats = []
-    for it in range(0, 125):
-            ti = random.randrange(10, 100)
-            knn = KNN(train_imgs[:ti], train_class_labels[:ti])
-            preds = knn.predict(test_imgs[:n_images_s], 4)
-            
-            trobats = Retrieval_by_shape(test_imgs[:n_images_s], preds, ["Dresses"])
-            print(get_shape_accuracy(trobats, ["Dresses"]))
-            ud.visualize_retrieval(trobats, len(trobats))
-            total_trobats.extend(trobats)
     
-    #get_shape_accuracy(total_trobats, test_class_labels)
+    mostrar_shape_acuracy(knn)
+    
     """
+    knn_labels = knn.predict(test_imgs, 3)
+    x = get_shape_accuracy(knn_labels, test_class_labels)
+
+    knn_labels = knn.predict(test_imgs, 4)
+    x = get_shape_accuracy(knn_labels, test_class_labels)
+    
+    
+    print(len(knn_labels), x)
+
+    """
+
+    
     

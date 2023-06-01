@@ -48,7 +48,7 @@ class KNN:
         for point in range(N):
             dist_point_index = np.argsort(np.array(dist[point]))[:k]
             self.neighbors.append([self.labels[i] for i in dist_point_index])
-        self.neighbors = np.array(self.neighbors)
+        #self.neighbors = np.array(self.neighbors)
               
                 
     def get_class(self):
@@ -58,7 +58,7 @@ class KNN:
                 1st array For each of the rows in self.neighbors gets the most voted value
                             (i.e. the class at which that row belongs)
                 2nd array For each of the rows in self.neighbors gets the % of votes for the winning class
-                
+        """
         #VERSION CON LISTAS
         vots = []
         percentatges = []
@@ -84,7 +84,7 @@ class KNN:
             percentatges.append(round(frecuencia/sum * 100,2))
 
         return np.array(vots)
-        
+        """
         #VERSION CON NP
         filas,columnas = self.neighbors.shape
         vots = np.random.random(filas).astype('<U8')
@@ -111,7 +111,7 @@ class KNN:
             percentatges[i] = round(frecuencia/sum * 100, 2)
 
         return vots
-        """
+        
         
         #VERSION CON NP
         filas,columnas = self.neighbors.shape
@@ -138,6 +138,7 @@ class KNN:
             posicio += 1
 
         return vots
+    """
     def predict(self, test_data, k):
         """
         predicts the class at which each element in test_data belongs to
