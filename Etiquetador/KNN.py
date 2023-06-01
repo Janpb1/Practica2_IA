@@ -27,7 +27,7 @@ class KNN:
         
         n_dimensions = train_data.shape
         P = n_dimensions[0]
-        D = n_dimensions[1] * n_dimensions[2]
+        D = n_dimensions[1] * n_dimensions[2] * n_dimensions[3]
         self.train_data = np.reshape(train_data, (P, D))
 
     def get_k_neighbours(self, test_data, k):
@@ -41,7 +41,7 @@ class KNN:
         
         n_dimensions = test_data.shape
         N = n_dimensions[0]
-        D = n_dimensions[1] * n_dimensions[2]
+        D = n_dimensions[1] * n_dimensions[2] * n_dimensions[3]
         NxD = np.reshape(test_data, (N, D))
         dist = cdist(NxD, self.train_data)
         
